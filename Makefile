@@ -28,7 +28,7 @@ runtime/37/arkhata.dll create_account create_character
 
 CC=gcc
 DEBUG=-g
-CFLAGS=-Wall -Wshadow -Werror -Wno-pointer-sign -fno-strict-aliasing -O3 $(DEBUG) -m32 -DSTAFF
+CFLAGS=-Wall -Wshadow -Werror -Wno-pointer-sign -fno-strict-aliasing -O3 $(DEBUG) -m32 -DSTAFF -D_FILE_OFFSET_BITS=64
 LDFLAGS=-O $(DEBUG) -m32 -L/usr/lib/mysql
 LDRFLAGS=-O $(DEBUG) -m32 -rdynamic -L/usr/lib/mysql
 DDFLAGS=-O $(DEBUG) -m32 -fPIC -shared

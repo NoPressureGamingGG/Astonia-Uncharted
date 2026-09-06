@@ -123,7 +123,17 @@ static int load_zones(char *dirname, char *mask, int (*process)(char *)) {
     dir = opendir(dirname);
     if (!dir) return 1;
 
-    while ((de = readdir(dir))) {
+    while (1) {
+        errno = 0;
+        de = readdir(dir);
+        if (!de) {
+            if (errno) {
+                elog("ERROR: Could not read zone directory \"%s\": %s", dirname, strerror(errno));
+                closedir(dir);
+                return 0;
+            }
+            break;
+        }
         if (!endcmp(de->d_name, mask)) continue;
 
         sprintf(name, "./%s/%s", dirname, de->d_name);
