@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
+#include <limits.h>
 
 #include "server.h"
 #include "log.h"
@@ -854,19 +855,64 @@ int die(int cnt, int sides) {
     return val;
 }
 
-// X exp yield level Y
+static unsigned int int_sqrt_floor(unsigned long long value) {
+    unsigned long long x = value;
+    unsigned long long y = (x + 1ULL) / 2ULL;
+
+    while (y < x) {
+        x = y;
+        y = (x + value / x) / 2ULL;
+    }
+
+    return (unsigned int)x;
+}
+
+// X exp yield level Y.
+// The server's curve is level^4, so the inverse is the fourth-root with an
+// exact integer floor. This keeps the level thresholds aligned with the same
+// integer math used by level2exp() and level_value().
 int exp2level(int val) {
-    return max(1, (int)(sqrt(sqrt(val))));
+    unsigned long long exp;
+    int level;
+
+    if (val <= 0) return 1;
+
+    exp = (unsigned long long)val;
+    level = int_sqrt_floor(exp);
+    level = int_sqrt_floor((unsigned long long)level);
+
+    if ((unsigned long long)(level + 1) * (level + 1) * (level + 1) * (level + 1) <= exp) {
+        level++;
+    }
+
+    return max(1, level);
 }
 
 // to reach level X you need Y exp
 int level2exp(int level) {
-    return pow(level, 4);
+    unsigned long long exp;
+
+    if (level <= 0) return 0;
+
+    exp = (unsigned long long)level * level * level * level;
+    if (exp > INT_MAX) return INT_MAX;
+
+    return (int)exp;
 }
 
 // to reach level X you need Y exp
 int level_value(int level) {
-    return pow(level + 1, 4) - pow(level, 4);
+    unsigned long long current, next;
+
+    if (level < 0) return 0;
+    if (level >= INT_MAX) return INT_MAX;
+
+    current = (unsigned long long)level * level * level * level;
+    next = (unsigned long long)(level + 1) * (level + 1) * (level + 1) * (level + 1);
+
+    if (next - current > INT_MAX) return INT_MAX;
+
+    return (int)(next - current);
 }
 
 char *save_number(int nr) {
