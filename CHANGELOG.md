@@ -9,6 +9,9 @@ using Added, Changed, Fixed, Removed, Security, and Migration categories.
 
 ### Fixed
 
+- Reconcile the Server 3 XP curve to use exact integer thresholds for level
+  conversion and next-level reward calculations, eliminating float-based drift at
+  quartic boundaries.
 - Enable large-file filesystem interfaces for the 32-bit Linux build so WSL
   Windows-mounted zone directories with large inode numbers load correctly.
 - Stop startup with an explicit error when zone directory enumeration fails,
