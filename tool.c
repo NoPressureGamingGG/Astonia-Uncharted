@@ -893,6 +893,7 @@ int level2exp(int level) {
     unsigned long long exp;
 
     if (level <= 0) return 0;
+    if (level > 65535) return INT_MAX;
 
     exp = (unsigned long long)level * level * level * level;
     if (exp > INT_MAX) return INT_MAX;
@@ -905,7 +906,7 @@ int level_value(int level) {
     unsigned long long current, next;
 
     if (level < 0) return 0;
-    if (level >= INT_MAX) return INT_MAX;
+    if (level > 65535) return INT_MAX;
 
     current = (unsigned long long)level * level * level * level;
     next = (unsigned long long)(level + 1) * (level + 1) * (level + 1) * (level + 1);
