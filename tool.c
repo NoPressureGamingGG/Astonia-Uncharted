@@ -856,17 +856,17 @@ int die(int cnt, int sides) {
 
 // X exp yield level Y
 int exp2level(int val) {
-    return max(1, (int)(sqrt(sqrt(val))));
+    return max(1, (int)(sqrt(sqrt(val / 2.0))));
 }
 
 // to reach level X you need Y exp
 int level2exp(int level) {
-    return pow(level, 4);
+    return 2*pow(level, 4);
 }
 
 // to reach level X you need Y exp
 int level_value(int level) {
-    return pow(level + 1, 4) - pow(level, 4);
+    return level2exp(level+1) - level2exp(level);
 }
 
 char *save_number(int nr) {
