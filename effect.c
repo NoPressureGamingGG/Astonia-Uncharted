@@ -50,6 +50,8 @@ int alloc_effect(int type) {
     // flags effect as used
     ef[fn].type = type;
     ef[fn].start = ticker;
+    // a reused slot must not inherit a previous effect's look (e.g. a green Plague burst)
+    ef[fn].burn_kind = 0;
 
     // add effect to used list
     ef[fn].next = ueffect;
@@ -263,6 +265,10 @@ int effect_changed(int fn) {
 }
 
 // ****** Fireball and helpers ***********
+
+// Short post-burn reapplication guard for the cosmetic Fireball experiment.
+// This is runtime state only; it is intentionally not persisted as character data.
+static int fireball_burn_cooldown[TOTAL_MAXCHARS];
 
 static void ef_fireball_set(int fn, int x, int y) {
     int m, co, cn, dam;
@@ -1038,17 +1044,92 @@ int create_earthmud(int cn, int x, int y, int strength) {
     return 1;
 }
 
+static int fireball_burn_path_clear(int x, int y, int tx, int ty) {
+    int steps, n, px, py, m;
+
+    steps = abs(tx - x) > abs(ty - y) ? abs(tx - x) : abs(ty - y);
+    if (!steps) return 0;
+
+    // The destination is occupied by the candidate character, so its own
+    // movement flag may describe the creature's spawn tile. Only intervening
+    // tiles must be traversable; the destination remains subject to LOS and
+    // combat checks below.
+    for (n = 1; n < steps; n++) {
+        px = x + (tx - x) * n / steps;
+        py = y + (ty - y) * n / steps;
+        m = px + py * MAXMAP;
+        if (map[m].flags & (MF_MOVEBLOCK | MF_TMOVEBLOCK | MF_SIGHTBLOCK | MF_TSIGHTBLOCK)) return 0;
+    }
+
+    return los_can_see(0, x, y, tx, ty, 5);
+}
+
 static void ef_burn(int fn) {
-    int cn;
+    int cn, co, x, y, dx, dy, n, already_burning;
 
     cn = ef[fn].cn;
     if (!cn || !(ch[cn].flags) || ch[cn].serial != ef[fn].sercn || ticker >= ef[fn].stop) {
+        if (cn > 0 && cn < MAXCHARS && (ef[fn].base_sprite >= 1 && ef[fn].base_sprite <= 4)) {
+            fireball_burn_cooldown[cn] = ticker + 3;
+        }
         remove_effect(fn);
         free_effect(fn);
         return;
     }
 
-    if (ef[fn].strength) hurt(cn, POWERSCALE / 6 + ef[fn].strength, 0, 30, 50, 75);
+    if (ef[fn].strength) {
+        int attacker = ef[fn].source_cn;
+        if (attacker < 1 || attacker >= MAXCHARS || !ch[attacker].flags) attacker = 0;
+        dps_hurt_effect(fn, cn, POWERSCALE / 6 + ef[fn].strength, attacker, 30, 50, 75);
+    }
+
+    // The burn marker can jump up to three times to an
+    // attackable target within two tiles. The internal marker tracks depth,
+    // distinguishes this experiment from ordinary burns, and prevents loops.
+    if (ef[fn].base_sprite >= 1 && ef[fn].base_sprite <= 3) {
+        x = ch[cn].x;
+        y = ch[cn].y;
+
+        for (dy = -3; dy <= 3; dy++) {
+            for (dx = -3; dx <= 3; dx++) {
+                if (!dx && !dy) continue;
+
+                co = 0;
+                if (x + dx >= 1 && x + dx < MAXMAP - 1 && y + dy >= 1 && y + dy < MAXMAP - 1) {
+                    co = map[x + dx + (y + dy) * MAXMAP].ch;
+                }
+                if (!co || co == ef[fn].source_cn || ticker < fireball_burn_cooldown[co] ||
+                    (ch[co].flags & (CF_DEAD | CF_NOATTACK)) ||
+                    !ef[fn].source_cn || !ch[ef[fn].source_cn].flags ||
+                    !can_attack(ef[fn].source_cn, co) ||
+                    !fireball_burn_path_clear(x, y, x + dx, y + dy)) continue;
+
+                already_burning = 0;
+                for (n = 0; n < 4; n++) {
+                    // Only a burn of the same kind counts.
+                    if (ch[co].ef[n] && ef[ch[co].ef[n]].type == EF_BURN &&
+                        ef[ch[co].ef[n]].burn_kind == ef[fn].burn_kind) {
+                        if (ef[ch[co].ef[n]].base_sprite >= 1) {
+                            ef[ch[co].ef[n]].burn_hits = 2;
+                            ef[ch[co].ef[n]].source_cn = ef[fn].source_cn;
+                            dps_copy_effect_owner(ch[co].ef[n], fn);
+                            ef[ch[co].ef[n]].stop = ef[fn].stop;
+                            update_char(co);
+                        }
+                        already_burning = 1;
+                        break;
+                    }
+                }
+                if (already_burning) continue;
+
+                // Spread keeps the parent's remaining duration (stop). Fire spread stays cosmetic.
+                {
+                    int added = create_fireball_burn(ef[fn].source_cn, co, ef[fn].stop, ef[fn].base_sprite + 1, 19);
+                    if (added) dps_copy_effect_owner(added, fn);
+                }
+            }
+        }
+    }
 }
 
 int create_show_effect(int type, int cn, int start, int stop, int light, int strength) {
@@ -1065,9 +1146,43 @@ int create_show_effect(int type, int cn, int start, int stop, int light, int str
     ef[fn].start = start;
     ef[fn].stop = stop;
     ef[fn].strength = strength;
+    ef[fn].base_sprite = 0;
+    ef[fn].burn_kind = 0;
+    ef[fn].source_cn = 0;
+    ef[fn].burn_hits = 0;
 
     add_effect_char(fn, cn);
 
+    return fn;
+}
+
+int create_fireball_burn(int source_cn, int target, int stop, int depth, int light) {
+    int n, fn;
+
+    if (target < 1 || target >= MAXCHARS || !(ch[target].flags)) return 0;
+
+    for (n = 0; n < 4; n++) {
+        fn = ch[target].ef[n];
+        // Only an existing Fire burn is refreshed.
+        if (fn && ef[fn].type == EF_BURN && ef[fn].burn_kind == BURN_KIND_FIRE && ef[fn].base_sprite >= 1) {
+            ef[fn].burn_hits = 2;
+            ef[fn].source_cn = source_cn;
+            dps_bind_effect(fn, source_cn);
+            ef[fn].stop = stop;
+            update_char(target);
+            return fn;
+        }
+    }
+
+    fn = create_show_effect(EF_BURN, target, ticker, stop, light, 0);
+    if (!fn) return 0;
+
+    ef[fn].base_sprite = depth;
+    ef[fn].burn_kind = BURN_KIND_FIRE;
+    ef[fn].source_cn = source_cn;
+    dps_bind_effect(fn, source_cn);
+    ef[fn].burn_hits = 1;
+    update_char(target);
     return fn;
 }
 

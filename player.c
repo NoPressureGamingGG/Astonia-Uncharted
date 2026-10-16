@@ -1560,6 +1560,8 @@ static int fill_ceffect(int fn, union ceffect *cef) {
         cef->burn.type = 12;
         cef->burn.cn = ef[fn].efcn;
         cef->burn.stop = ef[fn].stop;
+        cef->burn.black = (ef[fn].burn_hits >= 2);
+        cef->burn.kind = (unsigned char)ef[fn].burn_kind;
         return sizeof(struct cef_burn);
     case EF_MIST:
         cef->explode.nr = fn;

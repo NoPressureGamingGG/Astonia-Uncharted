@@ -516,7 +516,9 @@ struct effect {
 
     int start, stop; // ticker effect started, ends
 
-    int cn, sercn; // creator of effect (caster)
+    int cn, sercn; // creator of effect (caster) or effect target for show effects
+    int source_cn; // original caster for source-aware cosmetic effects
+    int burn_hits; // cosmetic burn applications received (for presentation)
     int strength; // strength of effect (usually skill level of caster)
     int light; // light emitted by effect
 
@@ -531,6 +533,7 @@ struct effect {
     int number_of_enemies; // number of enemies hit by effect last tick
 
     int base_sprite; // for explosion: sprite number
+    int burn_kind; // 0 none, 1 cosmetic Fireball burn
 };
 
 extern struct effect *ef;
@@ -543,16 +546,19 @@ extern struct effect *ef;
 // sizeof()/offsetof() below would not catch. Check: tools/abi_check.py.
 #include <stddef.h>
 #define AU_ABI_MAGIC 0x41554142u /* "AUAB" */
-#define AU_ABI_VERSION 1u
+#define AU_ABI_VERSION 2u
 struct au_abi {
     uint32_t magic, version, ptr_size, maxfield;
     uint32_t sz_map, sz_item, sz_character, sz_effect;
     uint32_t off_effect_field_cnt, off_effect_m;
+    uint32_t off_effect_source_cn, off_effect_burn_hits, off_effect_burn_kind;
 };
 __attribute__((weak, visibility("default"), used)) const struct au_abi au_abi_info = {
     AU_ABI_MAGIC, AU_ABI_VERSION, (uint32_t)sizeof(void *), MAXFIELD,
     (uint32_t)sizeof(struct map), (uint32_t)sizeof(struct item), (uint32_t)sizeof(struct character), (uint32_t)sizeof(struct effect),
-    (uint32_t)offsetof(struct effect, field_cnt), (uint32_t)offsetof(struct effect, m)};
+    (uint32_t)offsetof(struct effect, field_cnt), (uint32_t)offsetof(struct effect, m),
+    (uint32_t)offsetof(struct effect, source_cn), (uint32_t)offsetof(struct effect, burn_hits),
+    (uint32_t)offsetof(struct effect, burn_kind)};
 
 // *********** BASIC LIBRARY ******************
 unsigned long long prof_start(int task);

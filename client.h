@@ -132,6 +132,9 @@ struct cef_burn {
     int type;
     int cn;
     int stop;
+    int black;
+    unsigned short color;
+    unsigned char kind; // mirrors client cef_burn.kind; fits former tail padding, size unchanged
 };
 
 struct cef_mist {

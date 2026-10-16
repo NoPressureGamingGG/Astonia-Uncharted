@@ -38,6 +38,8 @@ Added RCS tags
 #define EF_FIRERING 23
 #define EF_BUBBLE 24
 
+#define BURN_KIND_FIRE 1
+
 extern int used_effects;
 
 int init_effect(void);
@@ -49,6 +51,7 @@ int remove_effect(int fn);
 int create_fireball(int cn, int frx, int fry, int tox, int toy, int str);
 int create_ball(int cn, int frx, int fry, int tox, int toy, int str);
 int create_show_effect(int type, int cn, int start, int stop, int light, int strength);
+int create_fireball_burn(int source_cn, int target, int stop, int depth, int light);
 int create_flash(int cn, int str, int duration);
 int ishit_fireball(int cn, int frx, int fry, int tox, int toy, int (*isenemy)(int, int));
 int calc_steps_ball(int cn, int frx, int fry, int tox, int toy);
