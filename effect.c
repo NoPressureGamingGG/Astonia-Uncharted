@@ -276,6 +276,13 @@ static void ef_fireball_set(int fn, int x, int y) {
 
         cn = ef[fn].cn;
 
+        // Keep the blast harmless to dialogue/other non-combat characters.
+        // The explosion visits every tile, but only legal attack targets may
+        // receive damage.
+        if (!can_attack(cn, co)) {
+            return;
+        }
+
         if (ch[co].flags & CF_EDEMON) { // earth demons shoot back
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
         }
@@ -324,55 +331,35 @@ static void ef_fireball_explode(int fn, int x, int y) {
     remove_effect(fn);
 
     if ((co = checkhit_fireball(x, y))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x + 1, y, 5) && (co = checkhit_fireball(x + 1, y))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x - 1, y, 5) && (co = checkhit_fireball(x - 1, y))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x, y + 1, 5) && (co = checkhit_fireball(x, y + 1))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x, y - 1, 5) && (co = checkhit_fireball(x, y - 1))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
@@ -380,44 +367,28 @@ static void ef_fireball_explode(int fn, int x, int y) {
     }
 
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x + 1, y + 1, 5) && (co = checkhit_fireball(x + 1, y + 1))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x + 1, y - 1, 5) && (co = checkhit_fireball(x + 1, y - 1))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x - 1, y + 1, 5) && (co = checkhit_fireball(x - 1, y + 1))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
         }
     }
     if (los_can_see(0, ef[fn].lx, ef[fn].ly, x - 1, y - 1, 5) && (co = checkhit_fireball(x - 1, y - 1))) {
-        if (!can_attack(cn, co)) {
-            free_effect(fn);
-            return;
-        }
-        if (ef_fireball_reflect(co, ef[fn].strength, fn)) {
+        if (can_attack(cn, co) && ef_fireball_reflect(co, ef[fn].strength, fn)) {
             create_fireball(co, ch[co].x, ch[co].y, ch[cn].x, ch[cn].y, ef[fn].strength - 1);
             free_effect(fn);
             return;
