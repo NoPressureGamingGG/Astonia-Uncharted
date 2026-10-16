@@ -47,6 +47,7 @@
 #include "club.h"
 #include "questlog.h"
 #include "player_driver.h"
+#include "dps.h"
 
 struct gotolist {
     char *name;
@@ -508,6 +509,16 @@ static int cmd_tell(int cn, char *ptr) {
     return 1;
 }
 
+static void cmd_resetdps(int cn, char *ptr) {
+    while (isspace((unsigned char)*ptr)) ptr++;
+    if (*ptr) {
+        log_char(cn, LOG_SYSTEM, 0, "Usage: /resetdps");
+        return;
+    }
+    dps_reset(cn);
+    log_char(cn, LOG_SYSTEM, 0, "Your DPS tracker has been reset.");
+}
+
 static void cmd_who(int cn) {
     int co;
 
@@ -859,6 +870,7 @@ static void cmd_help(int cn) {
     log_char(cn, LOG_SYSTEM, 0, "/clearhate - empty hate list completely");
     log_char(cn, LOG_SYSTEM, 0, "/tell <name> <text> - send a private message to another player");
     log_char(cn, LOG_SYSTEM, 0, "/allow <name> - allow another player to search your grave");
+    log_char(cn, LOG_SYSTEM, 0, "/resetdps - clear your DPS, peak and last hit");
     log_char(cn, LOG_SYSTEM, 0, "/status - show your lag control status and account options");
     log_char(cn, LOG_SYSTEM, 0, "/lag - create artificial lag");
     log_char(cn, LOG_SYSTEM, 0, "/maxlag <seconds> - set delay for lag control");
@@ -2183,6 +2195,11 @@ int command(int cn, char *ptr) { // 1=ok, 0=repeat
         cmd_questfix(cn, ptr);
         return 1;
     }
+    if ((len = cmdcmp(ptr, "resetdps", 8))) {
+        cmd_resetdps(cn, ptr + len);
+        return 1;
+    }
+
     if ((len = cmdcmp(ptr, "reset", 5)) && (ch[cn].flags & (CF_GOD))) {
         ptr += len;
         while (isspace(*ptr)) ptr++;

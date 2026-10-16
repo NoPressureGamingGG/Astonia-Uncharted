@@ -24,6 +24,7 @@
 #include "consistency.h"
 #include "database.h"
 #include "effect.h"
+#include "dps.h"
 
 // ********** effect allocation and freeing *************
 
@@ -72,6 +73,8 @@ void free_effect(int fn) {
         elog("trying to free already free effect %d", fn);
         return;
     }
+
+    dps_forget_effect(fn);
 
     // remove character from used list
     prev = ef[fn].prev;

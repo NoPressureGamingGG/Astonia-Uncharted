@@ -290,7 +290,8 @@ union ceffect {
 #define SV_QUESTLOG 52
 #define SV_PROTOCOL 53
 #define SV_RESERVED1 54
-#define SV_RESERVED2 55
+#define SV_DPS 55
+#define SV_RESERVED2 55 /* consumed by version8 DPS; legacy never receives it */
 #define SV_RESERVED3 56
 #define SV_RESERVED4 57
 #define SV_MOD1 58

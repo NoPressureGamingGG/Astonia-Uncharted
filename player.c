@@ -23,6 +23,7 @@
 #define NEED_PLAYER_STRUCT
 #define NEED_PLAYER_DRIVER
 #include "player.h"
+#include "dps.h"
 #undef NEED_PLAYER_STRUCT
 #undef NEED_PLAYER_DRIVER
 
@@ -344,6 +345,7 @@ static void read_login(int nr) {
     log_items(cn);
     ch[cn].login_time = realtime;
 
+    dps_reset(cn);
     buf[0] = SV_LOGINDONE;
     psend(nr, buf, 1);
 
@@ -2299,6 +2301,9 @@ static void player_stats(int nr) {
         psend(nr, buf, 3);
         if (!player[nr]) return;
     }
+
+    len = dps_build_packet(cn, player[nr]->client_version, buf);
+    if (len) { psend(nr, buf, len); if (!player[nr]) return; }
 
     // items
     if (ch[cn].flags & CF_ITEMS) {

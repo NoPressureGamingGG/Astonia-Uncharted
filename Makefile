@@ -697,3 +697,10 @@ pretty:
 pretty-check:
 	@ls *.c *.h | xargs -r clang-format --dry-run -Werror
 
+OBJS += .obj/dps.o
+server: .obj/dps.o
+.obj/dps.o: dps.c dps.h server.h client.h effect.h death.h
+	$(CC) $(CFLAGS) -o .obj/dps.o -c dps.c
+.obj/death.o .obj/effect.o .obj/player.o: dps.h
+
+.obj/command.o: dps.h
