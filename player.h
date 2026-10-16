@@ -37,6 +37,8 @@
 #define PAC_BALL2 17
 #define PAC_TELEPORT 18
 #define PAC_PULSE 19
+#define PAC_PLAGUE 20 // internal queued Plague map cast
+#define PAC_PLAGUE2 21 // internal queued Plague character cast
 
 #define MAXEF 64
 

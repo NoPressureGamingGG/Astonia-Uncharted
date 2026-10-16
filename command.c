@@ -1942,6 +1942,22 @@ int command(int cn, char *ptr) { // 1=ok, 0=repeat
         return 1;
     }
 
+    if ((len = cmdcmp(ptr, "plague", 6))) {
+        int x, y;
+
+        ptr += len;
+        while (isspace(*ptr)) ptr++;
+        x = atoi(ptr);
+        while (isdigit(*ptr)) ptr++;
+        while (isspace(*ptr)) ptr++;
+        y = atoi(ptr);
+        if (!(ch[cn].flags & CF_PLAYER) || !ch[cn].player ||
+            x < 1 || x >= MAXMAP - 1 || y < 1 || y >= MAXMAP - 1) {
+            log_char(cn, LOG_SYSTEM, 0, "Plague could not be cast at %d,%d.", x, y);
+        } else player_driver_mapspell(ch[cn].player, PAC_PLAGUE, x, y);
+        return 1;
+    }
+
     if ((len = cmdcmp(ptr, "jump", 4)) && (ch[cn].flags & (CF_STAFF | CF_GOD))) {
         int x = 0, y = 0, a = 0, m = 0, n;
 

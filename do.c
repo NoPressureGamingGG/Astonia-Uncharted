@@ -917,6 +917,50 @@ int do_earthmud(int cn, int x, int y, int strength) {
     return 1;
 }
 
+static int plague_ready[TOTAL_MAXCHARS];
+
+int do_plague(int cn, int x, int y) {
+    int dir, duration;
+
+    if (cn < 1 || cn >= MAXCHARS || (ch[cn].flags & CF_DEAD)) return 0;
+    /* Never replace a walk reservation or another in-flight action.
+       Client and chat casts enter the ordinary player action queue. */
+    if (ch[cn].action != AC_IDLE || ch[cn].tox || ch[cn].toy) {
+        error = ERR_ALREADY_WORKING;
+        return 0;
+    }
+    if ((ch[cn].flags & CF_NOMAGIC) && !(ch[cn].flags & CF_NONOMAGIC)) return 0;
+    if (warcried(cn) || !ch[cn].value[0][V_PLAGUE]) return 0;
+    if (ticker < plague_ready[cn]) {
+        error = ERR_ALREADY_WORKING;
+        return 0;
+    }
+    if (x < 1 || x >= MAXMAP - 1 || y < 1 || y >= MAXMAP - 1) return 0;
+    if (ch[cn].mana < FIREBALLCOST) return 0;
+
+    dir = offset2dx(ch[cn].x, ch[cn].y, x, y);
+    if (!dir) return 0; /* Plague has no Fire Ring manifestation. */
+
+    duration = speed(ch[cn].value[0][V_SPEED], ch[cn].speed_mode, DUR_MAGIC_ACTION / 2);
+    if (duration < 1) duration = 1;
+    plague_ready[cn] = ticker + duration;
+
+    /* Use the normal two-phase character action path so the client receives
+     * the cast action and renders its directional animation.  The projectile
+     * is still created by act_plagueball() after the cast phase, keeping
+     * Plague's effect path separate from Fireball's. */
+    ch[cn].step = 0;
+    ch[cn].action = AC_PLAGUE1;
+    ch[cn].act1 = x;
+    ch[cn].act2 = y;
+    ch[cn].duration = duration;
+    ch[cn].dir = dir;
+
+    ch[cn].mana -= FIREBALLCOST;
+    if (ch[cn].speed_mode == SM_FAST) ch[cn].endurance -= end_cost(cn);
+    return 1;
+}
+
 int do_ball(int cn, int x, int y) {
     int dir;
 

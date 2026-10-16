@@ -61,15 +61,16 @@ static int abi_verify(struct lib *lib) {
     if (!why) return 1;
 
     elog("FATAL ABI MISMATCH in %s: %s. Rebuild server and ALL drivers from one source snapshot.", lib->name, why);
-    elog("  server: ver %u ptr %u map %u item %u char %u effect %u (field_cnt@%u m@%u source_cn@%u burn_hits@%u burn_kind@%u) maxfield %u",
+    elog("  server: ver %u ptr %u map %u item %u char %u effect %u (field_cnt@%u m@%u source_cn@%u burn_hits@%u burn_kind@%u variant@%u color@%u color32@%u) maxfield %u",
         au_abi_info.version, au_abi_info.ptr_size, au_abi_info.sz_map, au_abi_info.sz_item, au_abi_info.sz_character,
         au_abi_info.sz_effect, au_abi_info.off_effect_field_cnt, au_abi_info.off_effect_m, au_abi_info.off_effect_source_cn,
-        au_abi_info.off_effect_burn_hits, au_abi_info.off_effect_burn_kind, au_abi_info.maxfield);
+        au_abi_info.off_effect_burn_hits, au_abi_info.off_effect_burn_kind, au_abi_info.off_effect_variant,
+        au_abi_info.off_effect_spell_color, au_abi_info.off_effect_spell_color32, au_abi_info.maxfield);
     if (abi && abi->magic == AU_ABI_MAGIC)
-        elog("  driver: ver %u ptr %u map %u item %u char %u effect %u (field_cnt@%u m@%u source_cn@%u burn_hits@%u burn_kind@%u) maxfield %u",
+        elog("  driver: ver %u ptr %u map %u item %u char %u effect %u (field_cnt@%u m@%u source_cn@%u burn_hits@%u burn_kind@%u variant@%u color@%u color32@%u) maxfield %u",
             abi->version, abi->ptr_size, abi->sz_map, abi->sz_item, abi->sz_character, abi->sz_effect,
             abi->off_effect_field_cnt, abi->off_effect_m, abi->off_effect_source_cn, abi->off_effect_burn_hits,
-            abi->off_effect_burn_kind, abi->maxfield);
+            abi->off_effect_burn_kind, abi->off_effect_variant, abi->off_effect_spell_color, abi->off_effect_spell_color32, abi->maxfield);
     fprintf(stderr, "FATAL ABI MISMATCH in %s: %s\n", lib->name, why);
     abi_failed = 1;
     return 0;

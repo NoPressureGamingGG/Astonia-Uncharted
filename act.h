@@ -53,6 +53,8 @@ Added RCS tags
 #define AC_PULSE 27
 
 #define AC_FIRERING 28
+#define AC_PLAGUE1 29
+#define AC_PLAGUE2 30
 
 #define AC_DIE 50
 

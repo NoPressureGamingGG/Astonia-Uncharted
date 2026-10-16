@@ -688,6 +688,21 @@ static void cl_charspell(int nr, char *buf, int driver) {
     player[nr]->act2=0; */
 }
 
+static void cl_plague(int nr, char *buf) {
+    int cn = player[nr]->cn;
+    int x = *(unsigned short *)(buf);
+    int y = *(unsigned short *)(buf + 2);
+    int co;
+
+    if (!x) {
+        co = y;
+        if (co < 1 || co >= MAXCHARS || !char_see_char(cn, co)) return;
+        player_driver_charspell(nr, PAC_PLAGUE2, co);
+        return;
+    }
+    player_driver_mapspell(nr, PAC_PLAGUE, x, y);
+}
+
 static void cl_selfspell(int nr, char *buf, int driver) {
     player_driver_selfspell(nr, driver);
     //player[nr]->action=driver;
@@ -1001,6 +1016,9 @@ static void read_input(int nr) {
     case CL_FIREBALL:
         need = 5;
         break;
+    case CL_PLAGUE:
+        need = 5;
+        break;
     case CL_BALL:
         need = 5;
         break;
@@ -1141,6 +1159,9 @@ static void read_input(int nr) {
 
     case CL_FIREBALL:
         cl_mapspell(nr, player[nr]->inbuf + 1, PAC_FIREBALL);
+        break;
+    case CL_PLAGUE:
+        cl_plague(nr, player[nr]->inbuf + 1);
         break;
     case CL_BALL:
         cl_mapspell(nr, player[nr]->inbuf + 1, PAC_BALL);
@@ -1478,11 +1499,13 @@ static int is_char_ceffect(int type) {
         return 1;
     case 24:
         return 0;
+    case EF_PULSE32:
+        return 0;
     }
     return 0;
 }
 
-static int fill_ceffect(int fn, union ceffect *cef) {
+static int fill_ceffect(int fn, union ceffect *cef, int rgb32) {
     bzero(cef, sizeof(union ceffect));
 
     switch (ef[fn].type) {
@@ -1500,6 +1523,7 @@ static int fill_ceffect(int fn, union ceffect *cef) {
         cef->ball.fry = ef[fn].fry;
         cef->ball.tox = ef[fn].tox;
         cef->ball.toy = ef[fn].toy;
+        cef->ball.color = ef[fn].spell_color;
         return sizeof(struct cef_ball);
     case EF_STRIKE:
         cef->strike.nr = fn;
@@ -1507,6 +1531,8 @@ static int fill_ceffect(int fn, union ceffect *cef) {
         cef->strike.cn = ef[fn].efcn;
         cef->strike.x = ef[fn].x;
         cef->strike.y = ef[fn].y;
+        cef->strike.color = ef[fn].spell_color;
+        // strike.storm stays 0 (no Storm in this branch), as live sends for a non-Storm strike
         return sizeof(struct cef_strike);
     case EF_FIREBALL:
         cef->fireball.nr = fn;
@@ -1516,23 +1542,29 @@ static int fill_ceffect(int fn, union ceffect *cef) {
         cef->fireball.fry = ef[fn].fry;
         cef->fireball.tox = ef[fn].tox;
         cef->fireball.toy = ef[fn].toy;
+        cef->fireball.color = ef[fn].spell_color;
+        cef->fireball.variant = (unsigned short)ef[fn].variant;
         return sizeof(struct cef_fireball);
     case EF_FLASH:
         cef->flash.nr = fn;
         cef->flash.type = 5;
         cef->flash.cn = ef[fn].cn;
+        cef->flash.color = ef[fn].spell_color;
+        // flash.storm stays 0 (no Storm in this branch), as live sends for a non-Storm flash
         return sizeof(struct cef_flash);
     case EF_EXPLODE:
         cef->explode.nr = fn;
         cef->explode.type = 7;
         cef->explode.start = ef[fn].start;
         cef->explode.base = ef[fn].base_sprite;
+        cef->explode.color = ef[fn].spell_color;
         return sizeof(struct cef_explode);
     case EF_WARCRY:
         cef->warcry.nr = fn;
         cef->warcry.type = 8;
         cef->warcry.cn = ef[fn].efcn;
         cef->warcry.stop = ef[fn].stop;
+        cef->warcry.color = ef[fn].spell_color;
         return sizeof(struct cef_warcry);
     case EF_BLESS:
         cef->bless.nr = fn;
@@ -1561,6 +1593,7 @@ static int fill_ceffect(int fn, union ceffect *cef) {
         cef->burn.cn = ef[fn].efcn;
         cef->burn.stop = ef[fn].stop;
         cef->burn.black = (ef[fn].burn_hits >= 2);
+        cef->burn.color = ef[fn].spell_color;
         cef->burn.kind = (unsigned char)ef[fn].burn_kind;
         return sizeof(struct cef_burn);
     case EF_MIST:
@@ -1615,8 +1648,16 @@ static int fill_ceffect(int fn, union ceffect *cef) {
         return sizeof(struct cef_lag);
     case EF_PULSE:
         cef->pulse.nr = fn;
-        cef->pulse.type = 21;
+        cef->pulse.type = rgb32 ? EF_PULSE32 : EF_PULSE;
         cef->pulse.start = ef[fn].start;
+        if (rgb32) {
+            cef->pulse32.nr = fn;
+            cef->pulse32.type = EF_PULSE32;
+            cef->pulse32.start = ef[fn].start;
+            cef->pulse32.color = ef[fn].spell_color32;
+            return sizeof(struct cef_pulse32);
+        }
+        cef->pulse.color = ef[fn].spell_color;
         return sizeof(struct cef_pulse);
     case EF_PULSEBACK:
         cef->pulseback.nr = fn;
@@ -2132,7 +2173,7 @@ static void player_map(int nr) {
             needef[f] = 0;
             usedef[n] = 1;
 
-            size = fill_ceffect(fn, &cef);
+            size = fill_ceffect(fn, &cef, player[nr]->client_version >= 4);
 
             if (memcmp(&cef, player[nr]->ceffect + n, size)) {
                 buf[0] = SV_CEFFECT;
@@ -2142,6 +2183,13 @@ static void player_map(int nr) {
                 if (!player[nr]) return;
 
                 memcpy(player[nr]->ceffect + n, &cef, size);
+                if (player[nr]->client_version >= 4 && ef[fn].spell_color32) {
+                    buf[0] = SV_CEFFECT_COLOR32;
+                    buf[1] = (unsigned char)n;
+                    buf[2] = (unsigned char)ef[fn].type;
+                    *(uint32_t *)(buf + 3) = ef[fn].spell_color32;
+                    psend(nr, buf, 7);
+                }
                 //log_char(cn,LOG_SYSTEM,0,"transmit 1 slot %d type %d",n,ef[fn].type);
             }
             player[nr]->seffect[n] = ef[fn].serial;
@@ -2174,7 +2222,7 @@ static void player_map(int nr) {
         if (n < MAXEF) {
             usedef[n] = 1;
 
-            size = fill_ceffect(fn, &cef);
+            size = fill_ceffect(fn, &cef, player[nr]->client_version >= 4);
 
             buf[0] = SV_CEFFECT;
             buf[1] = n;
@@ -2183,6 +2231,13 @@ static void player_map(int nr) {
             if (!player[nr]) return;
 
             memcpy(player[nr]->ceffect + n, &cef, size);
+            if (player[nr]->client_version >= 4 && ef[fn].spell_color32) {
+                buf[0] = SV_CEFFECT_COLOR32;
+                buf[1] = (unsigned char)n;
+                buf[2] = (unsigned char)ef[fn].type;
+                *(uint32_t *)(buf + 3) = ef[fn].spell_color32;
+                psend(nr, buf, 7);
+            }
 
             player[nr]->seffect[n] = ef[fn].serial;
 
