@@ -1089,8 +1089,8 @@ int add_spell(int cn, int driver, int duration, char *name) {
 
     it[in].driver = driver;
 
-    *(signed long *)(it[in].drdata) = ticker + duration;
-    *(signed long *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata) = ticker + duration;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
 
     it[in].carried = cn;
 
@@ -2097,41 +2097,41 @@ int lowhi_random(int val) {
 int create_spell_timer(int cn, int in, int pos) {
     switch (it[in].driver) {
     case IDR_BLESS:
-        create_show_effect(EF_BLESS, cn, *(signed long *)(it[in].drdata + 4), *(signed long *)(it[in].drdata), 0, it[in].mod_value[0]);
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        create_show_effect(EF_BLESS, cn, *(int32_t *)(it[in].drdata + 4), *(int32_t *)(it[in].drdata), 0, it[in].mod_value[0]);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     case IDR_WARCRY:
-        create_show_effect(EF_WARCRY, cn, *(signed long *)(it[in].drdata + 4), *(signed long *)(it[in].drdata), 0, 0);
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        create_show_effect(EF_WARCRY, cn, *(int32_t *)(it[in].drdata + 4), *(int32_t *)(it[in].drdata), 0, 0);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     case IDR_FREEZE:
-        create_show_effect(EF_FREEZE, cn, *(signed long *)(it[in].drdata + 4), *(signed long *)(it[in].drdata), 0, 0);
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        create_show_effect(EF_FREEZE, cn, *(int32_t *)(it[in].drdata + 4), *(int32_t *)(it[in].drdata), 0, 0);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     case IDR_FLASH:
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     case IDR_ARMOR:
     case IDR_WEAPON:
     case IDR_HP:
     case IDR_MANA:
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     case IDR_POTION_SP:
-        create_show_effect(EF_POTION, cn, *(signed long *)(it[in].drdata + 4), *(signed long *)(it[in].drdata), 0, it[in].mod_value[0]);
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        create_show_effect(EF_POTION, cn, *(int32_t *)(it[in].drdata + 4), *(int32_t *)(it[in].drdata), 0, it[in].mod_value[0]);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
 
     case IDR_CURSE:
-        create_show_effect(EF_CURSE, cn, *(signed long *)(it[in].drdata + 4), *(signed long *)(it[in].drdata), 0, -it[in].mod_value[0]);
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        create_show_effect(EF_CURSE, cn, *(int32_t *)(it[in].drdata + 4), *(int32_t *)(it[in].drdata), 0, -it[in].mod_value[0]);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
 
     case IDR_POISON0:
     case IDR_POISON1:
     case IDR_POISON2:
     case IDR_POISON3:
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         set_timer(ticker + TICKS, poison_callback, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     case IDR_NONOMAGIC:
@@ -2139,7 +2139,7 @@ int create_spell_timer(int cn, int in, int pos) {
     case IDR_INFRARED:
     case IDR_OXYGEN:
     case IDR_UWTALK:
-        set_timer(*(unsigned long *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
+        set_timer(*(uint32_t *)(it[in].drdata), remove_spell, cn, in, pos, ch[cn].serial, it[in].serial);
         break;
     }
     return 1;

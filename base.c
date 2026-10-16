@@ -3812,8 +3812,8 @@ void beyond_potion_driver(int in, int cn) {
 
     endtime = ticker + duration;
 
-    *(signed long *)(it[in2].drdata) = endtime;
-    *(signed long *)(it[in2].drdata + 4) = ticker;
+    *(int32_t *)(it[in2].drdata) = endtime;
+    *(int32_t *)(it[in2].drdata + 4) = ticker;
 
     it[in2].carried = cn;
 

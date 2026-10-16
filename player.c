@@ -2271,13 +2271,13 @@ static void player_stats(int nr) {
     }
     if (ch[cn].exp != player[nr]->exp) {
         buf[0] = SV_EXP;
-        *(unsigned long *)(buf + 1) = player[nr]->exp = ch[cn].exp;
+        *(uint32_t *)(buf + 1) = player[nr]->exp = ch[cn].exp;
         psend(nr, buf, 5);
         if (!player[nr]) return;
     }
     if (ch[cn].exp_used != player[nr]->exp_used) {
         buf[0] = SV_EXP_USED;
-        *(unsigned long *)(buf + 1) = player[nr]->exp_used = ch[cn].exp_used;
+        *(uint32_t *)(buf + 1) = player[nr]->exp_used = ch[cn].exp_used;
         psend(nr, buf, 5);
         if (!player[nr]) return;
     }

@@ -322,8 +322,8 @@ int save_char(int cn, int area) {
             *itmp = it[in];
             ilen += sizeof(struct item);
             if (IDR_ISSPELL(itmp->driver)) { // make drdata contain the remaining duration
-                *(signed long *)(itmp->drdata) -= ticker;
-                *(signed long *)(itmp->drdata + 4) -= ticker;
+                *(int32_t *)(itmp->drdata) -= ticker;
+                *(int32_t *)(itmp->drdata + 4) -= ticker;
                 //xlog("save: remembering time for spell. time left: %ld ticks",*(unsigned long*)(itmp->drdata));
             }
             itmp++;
@@ -549,8 +549,8 @@ int save_char_new(int cn, int area) {
             *itmp = it[in];
             ilen += sizeof(struct item);
             if (IDR_ISSPELL(itmp->driver)) { // make drdata contain the remaining duration
-                *(signed long *)(itmp->drdata) -= ticker;
-                *(signed long *)(itmp->drdata + 4) -= ticker;
+                *(int32_t *)(itmp->drdata) -= ticker;
+                *(int32_t *)(itmp->drdata + 4) -= ticker;
                 //xlog("save: remembering time for spell. time left: %ld ticks",*(unsigned long*)(itmp->drdata));
             }
             itmp++;
@@ -1810,8 +1810,8 @@ void tick_login(void) {
                     continue;
                 }
                 if (IDR_ISSPELL(it[in].driver)) {
-                    *(signed long *)(it[in].drdata) += ticker;
-                    *(signed long *)(it[in].drdata + 4) += ticker;
+                    *(int32_t *)(it[in].drdata) += ticker;
+                    *(int32_t *)(it[in].drdata + 4) += ticker;
                     create_spell_timer(cn, in, n);
                 } else {
                     if (it[in].driver) {
