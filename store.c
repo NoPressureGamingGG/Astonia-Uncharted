@@ -368,7 +368,7 @@ void player_store(int cn, int nr, int flag, int fast) {
 int init_store(void) {
     store = xcalloc(sizeof(struct store *) * MAXSTORE, IM_BASE);
     if (!store) return 0;
-    xlog("Allocated store: %.2fM (%d*%d)", sizeof(struct store *) * MAXSTORE / 1024.0 / 1024.0, sizeof(struct store *), MAXSTORE);
+    xlog("Allocated store: %.2fM (%zu*%d)", sizeof(struct store *) * MAXSTORE / 1024.0 / 1024.0, sizeof(struct store *), MAXSTORE);
     mem_usage += sizeof(struct store *) * MAXSTORE;
 
     return 1;

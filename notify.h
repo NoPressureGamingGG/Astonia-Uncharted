@@ -7,6 +7,8 @@
  *
  */
 
+#include <stdint.h>
+
 #define NT_CHAR 1 // there is a character
 #define NT_ITEM 2 // there is an item
 #define NT_GOTHIT 3 // we got hit!!
@@ -40,7 +42,9 @@
 #define NTID_GLADIATOR 16
 
 struct msg {
-    int type, dat1, dat2, dat3;
+    int type, dat1;
+    intptr_t dat2;
+    int dat3;
 
     struct msg *next, *prev;
 };
@@ -48,9 +52,9 @@ struct msg {
 extern int used_msgs;
 
 int init_notify(void);
-void notify_char(int cn, int type, int dat1, int dat2, int dat3);
-void notify_area(int xc, int yc, int type, int dat1, int dat2, int dat3);
+void notify_char(int cn, int type, int dat1, intptr_t dat2, int dat3);
+void notify_area(int xc, int yc, int type, int dat1, intptr_t dat2, int dat3);
 void purge_messages(int cn);
 void remove_message(int cn, struct msg *msg);
-void notify_all(int type, int dat1, int dat2, int dat3);
-void notify_area_shout(int xc, int yc, int type, int dat1, int dat2, int dat3);
+void notify_all(int type, int dat1, intptr_t dat2, int dat3);
+void notify_area_shout(int xc, int yc, int type, int dat1, intptr_t dat2, int dat3);

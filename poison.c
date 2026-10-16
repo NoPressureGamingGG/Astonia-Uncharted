@@ -30,8 +30,8 @@ void poison_someone(int cn, int pwr, int type) {
 
     endtime = ticker + POISONDURATION;
 
-    *(signed long *)(it[in].drdata) = endtime;
-    *(signed long *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata) = endtime;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
     *(unsigned short *)(it[in].drdata + 8) = pwr;
     *(unsigned short *)(it[in].drdata + 10) = 9;
 

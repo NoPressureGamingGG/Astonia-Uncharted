@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 /*
  *
  * $Id: server.h,v 1.4 2006/12/14 13:58:05 devel Exp $
@@ -532,6 +534,25 @@ struct effect {
 };
 
 extern struct effect *ef;
+
+// *********** SERVER/DRIVER ABI FINGERPRINT ******************
+// Every module that includes this header (server and each runtime/*.dll)
+// carries an identical copy. libload refuses to start with a driver whose
+// copy is missing or differs, so a stale driver can never index ch/it/ef/map
+// with an old layout. Bump AU_ABI_VERSION for shared-contract changes that
+// sizeof()/offsetof() below would not catch. Check: tools/abi_check.py.
+#include <stddef.h>
+#define AU_ABI_MAGIC 0x41554142u /* "AUAB" */
+#define AU_ABI_VERSION 1u
+struct au_abi {
+    uint32_t magic, version, ptr_size, maxfield;
+    uint32_t sz_map, sz_item, sz_character, sz_effect;
+    uint32_t off_effect_field_cnt, off_effect_m;
+};
+__attribute__((weak, visibility("default"), used)) const struct au_abi au_abi_info = {
+    AU_ABI_MAGIC, AU_ABI_VERSION, (uint32_t)sizeof(void *), MAXFIELD,
+    (uint32_t)sizeof(struct map), (uint32_t)sizeof(struct item), (uint32_t)sizeof(struct character), (uint32_t)sizeof(struct effect),
+    (uint32_t)offsetof(struct effect, field_cnt), (uint32_t)offsetof(struct effect, m)};
 
 // *********** BASIC LIBRARY ******************
 unsigned long long prof_start(int task);

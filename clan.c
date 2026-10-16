@@ -299,7 +299,7 @@ void tick_clan(void) {
         if (res == 1) {
             if (size) {
                 if (size != sizeof(clan)) {
-                    elog("Incompatible Clan data found! (%d vs %d)", size, sizeof(clan));
+                    elog("Incompatible Clan data found! (%d vs %zu)", size, sizeof(clan));
                     exit(1);
                 } else memcpy(clan, tmp, size);
                 xfree(tmp);

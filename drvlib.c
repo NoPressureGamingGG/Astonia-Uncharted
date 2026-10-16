@@ -2139,7 +2139,7 @@ int add_bonus_spell(int cn, int driver, int strength, int duration) {
 
     endtime = ticker + duration;
 
-    *(unsigned long *)(it[in].drdata) = endtime;
+    *(uint32_t *)(it[in].drdata) = endtime;
 
     it[in].carried = cn;
 

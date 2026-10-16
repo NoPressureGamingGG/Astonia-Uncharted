@@ -698,8 +698,8 @@ static int act_firering(int cn) {
 
     it[in].driver = IDR_FIRERING;
 
-    *(signed long *)(it[in].drdata) = ticker + TICKS; // one second
-    *(signed long *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata) = ticker + TICKS; // one second
+    *(int32_t *)(it[in].drdata + 4) = ticker;
 
     it[in].carried = cn;
 
@@ -787,8 +787,8 @@ static int act_flash(int cn) {
 
     it[in].driver = IDR_FLASH;
 
-    *(signed long *)(it[in].drdata) = ticker + duration;
-    *(signed long *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata) = ticker + duration;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
 
     it[in].carried = cn;
 
@@ -872,9 +872,9 @@ int bless_someone(int co, int strength, int duration) {
 
     it[in].driver = IDR_BLESS;
 
-    *(signed long *)(it[in].drdata) = ticker + duration;
-    *(signed long *)(it[in].drdata + 4) = ticker;
-    *(signed long *)(it[in].drdata + 8) = strength;
+    *(int32_t *)(it[in].drdata) = ticker + duration;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata + 8) = strength;
 
     it[in].carried = co;
 
@@ -913,9 +913,9 @@ int bless_self(int cn) {
     if (ch[cn].value[1][V_DURATION]) duration += BLESSDURATION * ch[cn].value[0][V_DURATION] / DURATION;
     else if (ch[cn].flags & CF_ARCH) duration += BLESSDURATION * ch[cn].level / DURATION / 2;
 
-    *(signed long *)(it[in].drdata) = ticker + duration;
-    *(signed long *)(it[in].drdata + 4) = ticker;
-    *(signed long *)(it[in].drdata + 8) = ch[cn].value[0][V_BLESS];
+    *(int32_t *)(it[in].drdata) = ticker + duration;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata + 8) = ch[cn].value[0][V_BLESS];
 
     it[in].carried = cn;
 
@@ -986,8 +986,8 @@ static void warcry_someone(int cn, int co, int pwr) {
     if (ch[cn].flags & CF_ARCH) endtime = ticker + WARCRYDURATION + WARCRYDURATION * ch[cn].level / DURATION / 2;
     else endtime = ticker + WARCRYDURATION;
 
-    *(signed long *)(it[in].drdata) = endtime;
-    *(signed long *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata) = endtime;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
 
     it[in].carried = co;
 
@@ -1095,8 +1095,8 @@ static int ice_curse(int co, int str, int max) {
 
         it[in].driver = IDR_CURSE;
 
-        *(signed long *)(it[in].drdata) = ticker + duration;
-        *(signed long *)(it[in].drdata + 4) = ticker;
+        *(int32_t *)(it[in].drdata) = ticker + duration;
+        *(int32_t *)(it[in].drdata + 4) = ticker;
 
         it[in].carried = co;
 
@@ -1158,8 +1158,8 @@ static void freeze_someone(int cn, int co) {
 
     endtime = ticker + duration;
 
-    *(signed long *)(it[in].drdata) = endtime;
-    *(signed long *)(it[in].drdata + 4) = ticker;
+    *(int32_t *)(it[in].drdata) = endtime;
+    *(int32_t *)(it[in].drdata + 4) = ticker;
 
     it[in].carried = co;
 

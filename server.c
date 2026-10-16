@@ -145,7 +145,7 @@ void showmem(void) {
     xlog("malloc/sbrk    : %.3fM", mi.arena / 1024.0 / 1024.0);
     xlog("malloc/total   : %.3fM", (mi.arena + mi.hblkhd) / 1024.0 / 1024.0);
     xlog("malloc/unused  : %.3fM in %d blocks", (mi.fordblks) / 1024.0 / 1024.0, mi.ordblks);
-    xlog("brk has grown  : %.3fM", ((int)(sbrk(0)) - (int)(end_of_data_ptr)) / (1024.0 * 1024.0));
+    xlog("brk has grown  : %.3fM", ((char *)sbrk(0) - (char *)end_of_data_ptr) / (1024.0 * 1024.0));
     xlog("------------------------------------");
     list_mem();
 }

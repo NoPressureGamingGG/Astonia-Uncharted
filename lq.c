@@ -57,7 +57,7 @@ int ch_respawn_driver(int nr, int cn); // called when an NPC is about to respawn
 int special_driver(int nr, int cn, char *ptr);
 
 // EXPORTED - character/item driver
-int driver(int type, int nr, int obj, int ret, int lastact) {
+int driver(int type, int nr, int obj, intptr_t ret, int lastact) {
     switch (type) {
     case CDT_DRIVER:
         return ch_driver(nr, obj, ret, lastact);

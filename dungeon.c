@@ -50,7 +50,7 @@ int ch_died_driver(int nr, int cn, int co); // called when a character dies
 int ch_respawn_driver(int nr, int cn); // called when an NPC is about to respawn
 
 // EXPORTED - character/item driver
-int driver(int type, int nr, int obj, int ret, int lastact) {
+int driver(int type, int nr, int obj, intptr_t ret, int lastact) {
     switch (type) {
     case CDT_DRIVER:
         return ch_driver(nr, obj, ret, lastact);
@@ -709,10 +709,10 @@ void build_door(int x, int y, int keyid, int keys) {
 
     in = create_item("dungeon_door");
 
-    if (keys > 0) *(unsigned long *)(it[in].drdata + 0) = MAKE_ITEMID(DEV_ID_MAZE1, keyid);
-    else *(unsigned long *)(it[in].drdata + 0) = 0;
-    if (keys > 1) *(unsigned long *)(it[in].drdata + 4) = MAKE_ITEMID(DEV_ID_MAZE2, keyid);
-    else *(unsigned long *)(it[in].drdata + 4) = 0;
+    if (keys > 0) *(uint32_t *)(it[in].drdata + 0) = MAKE_ITEMID(DEV_ID_MAZE1, keyid);
+    else *(uint32_t *)(it[in].drdata + 0) = 0;
+    if (keys > 1) *(uint32_t *)(it[in].drdata + 4) = MAKE_ITEMID(DEV_ID_MAZE2, keyid);
+    else *(uint32_t *)(it[in].drdata + 4) = 0;
     *(unsigned short *)(it[in].drdata + 8) = maze_clan;
 
     if (!set_item_map(in, x, y)) {
@@ -728,7 +728,7 @@ void build_key(int x, int y, int nr, int keyid) {
     it[in].drdata[0] = nr;
     it[in].drdata[1] = maze_clan;
     it[in].drdata[2] = 0;
-    *(unsigned long *)(it[in].drdata + 4) = keyid;
+    *(uint32_t *)(it[in].drdata + 4) = keyid;
 
     if (!set_item_map(in, x, y)) {
         destroy_item(in);
@@ -1578,9 +1578,9 @@ void dungeondoor(int in, int cn) {
 
     if (!cn) return;
 
-    ID1 = *(unsigned long *)(it[in].drdata + 0);
-    ID2 = *(unsigned long *)(it[in].drdata + 4);
-    cnr = *(unsigned long *)(it[in].drdata + 8);
+    ID1 = *(uint32_t *)(it[in].drdata + 0);
+    ID2 = *(uint32_t *)(it[in].drdata + 4);
+    cnr = *(uint32_t *)(it[in].drdata + 8);
 
     if (ID1 && !has_item(cn, ID1)) missing++;
     if (ID2 && !has_item(cn, ID2)) missing++;
@@ -1630,8 +1630,8 @@ void dungeondoor(int in, int cn) {
             server_chat(1028, buf);
         } else log_char(cn, LOG_SYSTEM, 0, "You won. Unfortunately there's nothing left to steal.");
 
-        *(unsigned long *)(it[in].drdata + 0) = 0;
-        *(unsigned long *)(it[in].drdata + 4) = 0;
+        *(uint32_t *)(it[in].drdata + 0) = 0;
+        *(uint32_t *)(it[in].drdata + 4) = 0;
         it[in].drdata[12] = 1;
 
         for (co = getfirst_char(); co; co = getnext_char(co)) {
@@ -1676,10 +1676,10 @@ void dungeonkey(int in, int cn) {
 
     if (it[in].drdata[0] == 1) {
         in2 = create_item("maze_key1");
-        it[in2].ID = MAKE_ITEMID(DEV_ID_MAZE1, *(unsigned long *)(it[in].drdata + 4));
+        it[in2].ID = MAKE_ITEMID(DEV_ID_MAZE1, *(uint32_t *)(it[in].drdata + 4));
     } else {
         in2 = create_item("maze_key2");
-        it[in2].ID = MAKE_ITEMID(DEV_ID_MAZE2, *(unsigned long *)(it[in].drdata + 4));
+        it[in2].ID = MAKE_ITEMID(DEV_ID_MAZE2, *(uint32_t *)(it[in].drdata + 4));
     }
 
     if (!in2) {
@@ -1745,8 +1745,8 @@ int dungeon_potion(int cn) {
 
     endtime = ticker + duration;
 
-    *(signed long *)(it[in2].drdata) = endtime;
-    *(signed long *)(it[in2].drdata + 4) = ticker;
+    *(int32_t *)(it[in2].drdata) = endtime;
+    *(int32_t *)(it[in2].drdata + 4) = ticker;
 
     it[in2].carried = cn;
 

@@ -1238,10 +1238,10 @@ int command(int cn, char *ptr) { // 1=ok, 0=repeat
     expand_alias(cn, buf, ptr);
     ptr = buf;
 
-    if (areaID == 20 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
-    if (areaID == 35 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
-    if (areaID == 23 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
-    if (areaID == 24 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
+    if (areaID == 20 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
+    if (areaID == 35 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
+    if (areaID == 23 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
+    if (areaID == 24 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
 
     if (*ptr != '#' && *ptr != '/') {
         if (ch[cn].flags & CF_SHUTUP) {

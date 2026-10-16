@@ -1395,7 +1395,7 @@ int init_effect(void) {
 
     ef = xcalloc(sizeof(struct effect) * MAXEFFECT, IM_BASE);
     if (!ef) return 0;
-    xlog("Allocated effects: %.2fM (%d*%d)", sizeof(struct effect) * MAXEFFECT / 1024.0 / 1024.0, sizeof(struct effect), MAXEFFECT);
+    xlog("Allocated effects: %.2fM (%zu*%d)", sizeof(struct effect) * MAXEFFECT / 1024.0 / 1024.0, sizeof(struct effect), MAXEFFECT);
     mem_usage += sizeof(struct effect) * MAXEFFECT;
 
     for (n = 1; n < MAXEFFECT; n++) {

@@ -44,7 +44,7 @@ int ch_died_driver(int nr, int cn, int co); // called when a character dies
 int ch_respawn_driver(int nr, int cn); // called when an NPC is about to respawn
 
 // EXPORTED - character/item driver
-int driver(int type, int nr, int obj, int ret, int lastact) {
+int driver(int type, int nr, int obj, intptr_t ret, int lastact) {
     switch (type) {
     case CDT_DRIVER:
         return ch_driver(nr, obj, ret, lastact);
@@ -281,15 +281,15 @@ void palace_bomb(int in, int cn) {
             sound_area(it[in].x, it[in].y, 6);
 
             m = it[in].x + it[in].y * MAXMAP;
-            if ((co = map[m].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m + 1].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m - 1].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m + MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m - MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m + 1 + MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m + 1 - MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m - 1 + MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
-            if ((co = map[m - 1 - MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(unsigned long *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m + 1].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m - 1].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m + MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m - MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m + 1 + MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m + 1 - MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m - 1 + MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
+            if ((co = map[m - 1 - MAXMAP].ch) && (!(ch[co].flags & CF_PLAYER) || *(uint32_t *)(it[in].drdata + 1) == ch[co].ID) && strcmp(ch[co].name, "Islena")) create_show_effect(EF_BURN, co, ticker, ticker + TICKS * 60, 250, POWERSCALE * 2);
             remove_item(in);
             destroy_item(in);
         } else if (it[in].drdata[0] == 1 && it[in].carried) {
@@ -300,7 +300,7 @@ void palace_bomb(int in, int cn) {
             it[in].drdata[0] = 1;
             it[in].sprite++;
             ch[cn].flags |= CF_ITEMS;
-            *(unsigned long *)(it[in].drdata + 1) = ch[cn].ID;
+            *(uint32_t *)(it[in].drdata + 1) = ch[cn].ID;
         }
         return;
     }
