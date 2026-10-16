@@ -207,7 +207,7 @@ int init_container(void) {
 
     con = xcalloc(sizeof(struct container) * MAXCONTAINER, IM_BASE);
     if (!con) return 0;
-    xlog("Allocated containers: %.2fM (%d*%d)", sizeof(struct container) * MAXCONTAINER / 1024.0 / 1024.0, sizeof(struct container), MAXCONTAINER);
+    xlog("Allocated containers: %.2fM (%zu*%d)", sizeof(struct container) * MAXCONTAINER / 1024.0 / 1024.0, sizeof(struct container), MAXCONTAINER);
     mem_usage += sizeof(struct container) * MAXCONTAINER;
 
     // add containers to free list

@@ -7,6 +7,10 @@ gcc2_compiled.:
 	.type	 rdtsc,@function
 rdtsc:
 	rdtsc
+#ifdef __x86_64__
+	shl $32, %rdx
+	or %rdx, %rax
+#endif
 	ret
 .Lfe1:
 	.size	 rdtsc,.Lfe1-rdtsc

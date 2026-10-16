@@ -317,12 +317,12 @@ int pathnodes(void) {
 int init_path(void) {
     nmap = xcalloc(MAXMAP * MAXMAP * sizeof(struct node *), IM_BASE);
     if (!nmap) return 0;
-    xlog("Allocated nmap: %.2fM (%d*%d)", sizeof(struct node *) * MAXMAP * MAXMAP / 1024.0 / 1024.0, sizeof(struct node *), MAXMAP * MAXMAP);
+    xlog("Allocated nmap: %.2fM (%zu*%d)", sizeof(struct node *) * MAXMAP * MAXMAP / 1024.0 / 1024.0, sizeof(struct node *), MAXMAP * MAXMAP);
     mem_usage += sizeof(struct node *) * MAXMAP * MAXMAP;
 
     nodes = xcalloc(sizeof(struct node) * MAXNODE, IM_BASE);
     if (!nodes) return 0;
-    xlog("Allocated nodes: %.2fM (%d*%d)", sizeof(struct node) * MAXNODE / 1024.0 / 1024.0, sizeof(struct node), MAXNODE);
+    xlog("Allocated nodes: %.2fM (%zu*%d)", sizeof(struct node) * MAXNODE / 1024.0 / 1024.0, sizeof(struct node), MAXNODE);
     mem_usage += sizeof(struct node) * MAXNODE;
 
     return 1;

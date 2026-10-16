@@ -298,10 +298,10 @@ int init_io(void) {
     player = xcalloc(sizeof(struct player *) * MAXPLAYER, IM_BASE);
     if (!player) return 0;
 
-    xlog("Allocated players: %.2fM (%d*%d)", sizeof(struct player *) * MAXPLAYER / 1024.0 / 1024.0, sizeof(struct player *), MAXPLAYER);
+    xlog("Allocated players: %.2fM (%zu*%d)", sizeof(struct player *) * MAXPLAYER / 1024.0 / 1024.0, sizeof(struct player *), MAXPLAYER);
     mem_usage += sizeof(struct player *) * MAXPLAYER;
 
-    xlog("Size of player data: %d bytes", sizeof(struct player));
+    xlog("Size of player data: %zu bytes", sizeof(struct player));
 
     sock = socket(PF_INET, SOCK_STREAM, 0);
     if (sock == -1) return 0;

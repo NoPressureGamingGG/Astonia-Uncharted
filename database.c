@@ -1763,6 +1763,16 @@ void tick_login(void) {
 
         // character data
         copy_char(ch + cn, (void *)login.chr);
+
+        // The character blob is persisted as a fixed-width record, but these
+        // fields are process-local pointers.  A 64-bit process must never
+        // interpret pointer bytes from a 32-bit (or older) save as live
+        // addresses.  Clear them before loading items, because spell items
+        // can create effects immediately and those effects may allocate PPD.
+        ch[cn].dat = NULL;
+        ch[cn].msg = NULL;
+        ch[cn].msg_last = NULL;
+        ch[cn].arg = NULL;
         ch[cn].serial = sercn++;
         ch[cn].ef[0] = ch[cn].ef[1] = ch[cn].ef[2] = ch[cn].ef[3] = 0;
 
@@ -2995,6 +3005,7 @@ void db_read_clanlog(char *query) {
     MYSQL_ROW row;
     int cnID, date, cnr, serial, cnt = 0;
     struct tm *tm;
+    time_t log_date;
 
     if (mysql_query_con(&mysql, query)) {
         elog("Failed to read clanlog: Error: %s (%d)", mysql_error(&mysql), mysql_errno(&mysql));
@@ -3017,7 +3028,8 @@ void db_read_clanlog(char *query) {
         if (clan_serial(cnr) == serial && get_clan_name(cnr)) strcpy(clan_name, get_clan_name(cnr));
         else sprintf(clan_name, "Former clan %d", cnr);
 
-        tm = localtime((time_t *)&date);
+        log_date = date;
+        tm = localtime(&log_date);
 
         cnt++;
         if (cnt > 50) {
@@ -3587,11 +3599,13 @@ void add_iplog(int ID, unsigned int ip) {
 
     if ((row = mysql_fetch_row(result))) { // found suitable entry
         int use_count;
+        int iplog_id;
 
         use_count = atoi(row[1]);
+        iplog_id = atoi(row[0]);
         mysql_free_result(result);
 
-        sprintf(buf, "update iplog set use_time=%d,use_count=%d where ID=%s", (int)time(NULL), use_count + 1, row[0]);
+        sprintf(buf, "update iplog set use_time=%d,use_count=%d where ID=%d", (int)time(NULL), use_count + 1, iplog_id);
     } else { // no suitable entry found
         mysql_free_result(result);
 

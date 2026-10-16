@@ -54,7 +54,7 @@ int ch_died_driver(int nr, int cn, int co); // called when a character dies
 int ch_respawn_driver(int nr, int cn); // called when an NPC is about to respawn
 
 // EXPORTED - character/item driver
-int driver(int type, int nr, int obj, int ret, int lastact) {
+int driver(int type, int nr, int obj, intptr_t ret, int lastact) {
     switch (type) {
     case CDT_DRIVER:
         return ch_driver(nr, obj, ret, lastact);
@@ -585,7 +585,7 @@ void chest_driver(int in, int cn) {
     // get chest number
     nr = it[in].drdata[0];
     if (nr >= sizeof(ppd->last_access) / sizeof(int)) {
-        elog("treasure_chest item driver: chest number (drdata[0]) must be below %d!", sizeof(ppd->last_access) / sizeof(int));
+        elog("treasure_chest item driver: chest number (drdata[0]) must be below %zu!", sizeof(ppd->last_access) / sizeof(int));
         return;
     }
 

@@ -9,6 +9,7 @@
 #include <sys/mman.h>
 #include <malloc.h>
 #include <pthread.h>
+#include <stdint.h>
 
 #include "log.h"
 #include "btrace.h"
@@ -398,7 +399,7 @@ int init_smalloc(void) {
     };
 
     for (n = 0, addr = 0x50000000; n < 32; n++) {
-        reg_addr[n].start = (void *)addr;
+        reg_addr[n].start = (void *)(uintptr_t)(unsigned int)addr;
         reg_addr[n].size = sizes[n];
         addr += sizes[n];
         /*printf("%s: start=%p, size=%.2fM, end=%p\n",

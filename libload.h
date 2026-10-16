@@ -12,6 +12,8 @@ Added RCS tags
 
 */
 
+#include <stdint.h>
+
 int init_lib(void);
 void exit_lib(void);
 
@@ -21,5 +23,5 @@ void exit_lib(void);
 #define CDT_RESPAWN 3
 #define CDT_SPECIAL 4
 
-int char_driver(int nr, int type, int cn, int ret, int last_action);
+int char_driver(int nr, int type, int cn, intptr_t ret, int last_action);
 int item_driver(int nr, int in, int cn);

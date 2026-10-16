@@ -31,6 +31,7 @@ void ilog(char *format, ...) {
     va_list args;
     char buf[1024];
     struct tm *tm;
+    time_t now;
 
     if (!infofp) return;
 
@@ -39,7 +40,8 @@ void ilog(char *format, ...) {
     vsnprintf(buf, 1024, format, args);
     va_end(args);
 
-    tm = localtime((time_t *)&time_now);
+    now = time_now;
+    tm = localtime(&now);
     fprintf(infofp, "%02d.%02d.%02d %02d:%02d:%02d [%03d-%02d]: %s\n",
             tm->tm_mday, tm->tm_mon + 1, tm->tm_year - 100, tm->tm_hour, tm->tm_min, tm->tm_sec, areaID, areaM,
             buf);
@@ -55,6 +57,7 @@ void elog(char *format, ...) {
     va_list args;
     char buf[1024];
     struct tm *tm;
+    time_t now;
 
     pthread_mutex_lock(&log_mutex);
     last_error = time_now;
@@ -63,7 +66,8 @@ void elog(char *format, ...) {
     vsnprintf(buf, 1024, format, args);
     va_end(args);
 
-    tm = localtime((time_t *)&time_now);
+    now = time_now;
+    tm = localtime(&now);
     fprintf(errorfp, "%02d.%02d.%02d %02d:%02d:%02d [%03d-%02d]: %s\n",
             tm->tm_mday, tm->tm_mon + 1, tm->tm_year - 100, tm->tm_hour, tm->tm_min, tm->tm_sec, areaID, areaM,
             buf);
@@ -79,13 +83,15 @@ void xlog(char *format, ...) {
     va_list args;
     char buf[1024];
     struct tm *tm;
+    time_t now;
 
     pthread_mutex_lock(&log_mutex);
     va_start(args, format);
     vsnprintf(buf, 1024, format, args);
     va_end(args);
 
-    tm = localtime((time_t *)&time_now);
+    now = time_now;
+    tm = localtime(&now);
     fprintf(logfp, "%02d.%02d.%02d %02d:%02d:%02d [%03d-%02d]: %s\n",
             tm->tm_mday, tm->tm_mon + 1, tm->tm_year - 100, tm->tm_hour, tm->tm_min, tm->tm_sec, areaID, areaM,
             buf);
@@ -123,9 +129,11 @@ static int logday = -1;
 int init_log(void) {
     char buf[80];
     struct tm *tm;
+    time_t now;
 
     if (demon) {
-        tm = localtime((time_t *)&time_now);
+        now = time_now;
+        tm = localtime(&now);
         logday = tm->tm_mday;
 
         sprintf(buf, "%02d_%02d_%02d.log", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
@@ -159,8 +167,10 @@ void exit_log(void) {
 
 void reinit_log(void) {
     struct tm *tm;
+    time_t now;
 
-    tm = localtime((time_t *)&time_now);
+    now = time_now;
+    tm = localtime(&now);
     if (demon && logday != tm->tm_mday) {
         xlog("switching logfiles - last entry in old log");
         pthread_mutex_lock(&log_mutex);

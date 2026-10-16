@@ -48,7 +48,7 @@ int log_char(int cn, int type, int dat1, char *format, ...) {
         nr = ch[cn].player;
         if (!log_player(nr, type, "%s", buf)) return 0;
     } else {
-        notify_char(cn, NT_TEXT, type, (int)xstrdup(buf, IM_TALK), dat1);
+        notify_char(cn, NT_TEXT, type, (intptr_t)xstrdup(buf, IM_TALK), dat1);
     }
 
     return len;

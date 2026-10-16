@@ -19,7 +19,7 @@ static int dodoors = 0, doorx, doory;
 int init_los(void) {
     los = xcalloc(sizeof(struct los) * MAXCHARS, IM_BASE);
     if (!los) return 0;
-    xlog("Allocated los: %.2fM (%d*%d)", sizeof(struct los) * MAXCHARS / 1024.0 / 1024.0, sizeof(struct los), MAXCHARS);
+    xlog("Allocated los: %.2fM (%zu*%d)", sizeof(struct los) * MAXCHARS / 1024.0 / 1024.0, sizeof(struct los), MAXCHARS);
     mem_usage += sizeof(struct los) * MAXCHARS;
 
     return 1;
