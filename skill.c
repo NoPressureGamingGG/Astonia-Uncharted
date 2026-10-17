@@ -59,7 +59,7 @@ struct skill skill[V_MAX] = {
     {"Magic Shield", V_INT, V_INT, V_WIS, 1, 1}, // 31		done
     {"Lightning", V_INT, V_INT, V_WIS, 1, 1}, // 32		done
     {"Fire", V_INT, V_INT, V_WIS, 1, 1}, // 33		done
-    {"empty", V_INT, V_INT, V_WIS, 1, 1}, // 34		done
+    {"Plague", V_INT, V_INT, V_WIS, 1, 1}, // 34		done
 
     {"Regenerate", V_STR, V_STR, V_STR, 1, 1}, // 35		done
     {"Meditate", V_WIS, V_WIS, V_WIS, 1, 1}, // 36		done

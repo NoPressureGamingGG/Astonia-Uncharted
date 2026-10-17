@@ -257,7 +257,7 @@ static char *V_tab[V_MAX] = {
     "V_MAGICSHIELD",
     "V_FLASH",
     "V_FIREBALL",
-    "V_ARCANE",
+    "V_PLAGUE",
 
     "V_REGENERATE",
     "V_MEDITATE",
@@ -274,6 +274,10 @@ static int lookup_V(char *name) {
     for (n = 0; n < V_MAX; n++) {
         if (!strcasecmp(V_tab[n], name)) return n;
     }
+
+    /* Slot 34 was historically exposed to templates as V_ARCANE. Keep old
+     * zone content loadable while making V_PLAGUE the canonical token. */
+    if (!strcasecmp(name, "V_ARCANE")) return V_PLAGUE;
 
     return -1;
 }

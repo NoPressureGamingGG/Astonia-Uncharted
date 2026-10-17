@@ -24,6 +24,7 @@ int do_bless(int cn, int co);
 int do_heal(int cn, int co);
 
 int do_fireball(int cn, int x, int y);
+int do_plague(int cn, int x, int y);
 int do_ball(int cn, int x, int y);
 
 int do_magicshield(int cn);

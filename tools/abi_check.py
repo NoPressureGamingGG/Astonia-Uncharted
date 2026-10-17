@@ -15,7 +15,8 @@ import subprocess
 import sys
 
 FIELDS = ("magic version ptr_size maxfield sz_map sz_item sz_character sz_effect "
-          "off_effect_field_cnt off_effect_m").split()
+          "off_effect_field_cnt off_effect_m off_effect_source_cn off_effect_burn_hits off_effect_burn_kind "
+          "off_effect_variant off_effect_spell_color off_effect_spell_color32").split()
 
 
 def readelf(*args):

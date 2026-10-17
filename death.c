@@ -27,6 +27,7 @@
 #include "sector.h"
 #include "area.h"
 #include "death.h"
+#include "dps.h"
 #include "lookup.h"
 #include "chat.h"
 #include "drvlib.h"
@@ -652,6 +653,7 @@ int allow_body_db(int cnID, int coID) {
 
 int hurt(int cn, int dam, int cc, int armordiv, int armorper, int shieldper) {
     int str, n, fn;
+    int dps_source_serial;
     int teufel_shield = 0, teufel_life = 0;
     extern int showattack;
 
@@ -669,6 +671,8 @@ int hurt(int cn, int dam, int cc, int armordiv, int armorper, int shieldper) {
         error = ERR_ILLEGAL_CHARNO;
         return 0;
     }
+
+    dps_source_serial = dps_damage_source_serial(cc);
 
     if (dam < 0) {
         elog("got negative damage %d to %s (%d) from %s (%d). Set to 0.", dam, ch[cn].name, cn, ch[cc].name, cc);
@@ -726,7 +730,11 @@ int hurt(int cn, int dam, int cc, int armordiv, int armorper, int shieldper) {
             teufel_shield = str;
         }
 
-        ch[cn].hp -= dam;
+        {
+            int hp_before_damage = ch[cn].hp;
+            ch[cn].hp -= dam;
+            dps_record_damage(cc, dps_source_serial, cn, min(max(0, hp_before_damage), dam), teufel_shield);
+        }
         teufel_life = dam;
 
         if (areaID == 34 && (ch[cn].flags & CF_PLAYER) && cc && (ch[cc].flags & CF_PLAYER) && (map[ch[cn].x + ch[cn].y * MAXMAP].flags & MF_ARENA)) teufel_damage(cn, cc, teufel_life + teufel_shield);

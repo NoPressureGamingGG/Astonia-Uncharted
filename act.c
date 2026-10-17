@@ -755,6 +755,23 @@ static int act_fireball(int cn) {
     return 1;
 }
 
+static int act_plagueball(int cn) {
+    int fn;
+
+    if ((ch[cn].flags & CF_NOMAGIC) && !(ch[cn].flags & CF_NONOMAGIC)) return 0;
+
+    fn = create_plagueball(cn, ch[cn].x, ch[cn].y, ch[cn].act1, ch[cn].act2,
+        spellpower(cn, V_PLAGUE));
+    if (fn) {
+        if (!(ch[cn].flags & CF_NONOTIFY)) notify_area(ch[cn].x, ch[cn].y, NT_CHAR, cn, 0, 0);
+        notify_area(ch[cn].x, ch[cn].y, NT_SPELL, cn, V_PLAGUE, fn);
+        sound_area(ch[cn].x, ch[cn].y, 5);
+    }
+    ch[cn].action = AC_PLAGUE2;
+    ch[cn].step = 0;
+    return 1;
+}
+
 static int act_earthrain(int cn) {
 
     create_earthrain(cn, ch[cn].act1 % MAXMAP, ch[cn].act1 / MAXMAP, ch[cn].act2);
@@ -1439,6 +1456,10 @@ static int act(int cn) {
     case AC_FIREBALL1:
         return act_fireball(cn);
     case AC_FIREBALL2:
+        return act_ok(cn);
+    case AC_PLAGUE1:
+        return act_plagueball(cn);
+    case AC_PLAGUE2:
         return act_ok(cn);
     case AC_MAGICSHIELD:
         return act_magicshield(cn);
