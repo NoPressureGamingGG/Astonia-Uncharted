@@ -13,6 +13,8 @@
 #define DIST 25
 #endif
 
+#include <stdint.h>
+
 #define CMF_LIGHT (1 + 2 + 4 + 8)
 #define CMF_VISIBLE 16
 #define CMF_TAKE 32
@@ -58,6 +60,8 @@ struct cef_strike {
     int type;
     int cn;
     int x, y; // target
+    unsigned short color; // live wire field; 0 = client default
+    unsigned char storm; // live wire field (Storm bolt); always 0 in this branch
 };
 
 struct cef_pulseback {
@@ -73,6 +77,7 @@ struct cef_ball {
     int start;
     int frx, fry; // high precision coords
     int tox, toy; // high precision coords
+    unsigned short color; // live wire field; 0 = client default
 };
 
 struct cef_fireball {
@@ -81,12 +86,16 @@ struct cef_fireball {
     int start;
     int frx, fry; // high precision coords
     int tox, toy; // high precision coords
+    unsigned short color;
+    unsigned short variant;
 };
 
 struct cef_flash {
     int nr;
     int type;
     int cn;
+    unsigned short color; // live wire field; 0 = client default
+    unsigned char storm; // live wire field (Storm flash); always 0 in this branch
 };
 
 struct cef_explode {
@@ -94,6 +103,7 @@ struct cef_explode {
     int type;
     int start;
     int base;
+    unsigned short color;
 };
 
 struct cef_warcry {
@@ -101,6 +111,7 @@ struct cef_warcry {
     int type;
     int cn;
     int stop;
+    unsigned short color; // live wire field; 0 = client default
 };
 
 struct cef_bless {
@@ -132,6 +143,9 @@ struct cef_burn {
     int type;
     int cn;
     int stop;
+    int black;
+    unsigned short color;
+    unsigned char kind; // mirrors client cef_burn.kind; fits former tail padding, size unchanged
 };
 
 struct cef_mist {
@@ -144,6 +158,14 @@ struct cef_pulse {
     int nr;
     int type;
     int start;
+    unsigned short color; // live wire field; 0 = client default
+};
+
+struct cef_pulse32 { // EF_PULSE as sent to RGB32 (protocol >= 4) clients, wire type 25
+    int nr;
+    int type;
+    int start;
+    uint32_t color;
 };
 
 struct cef_potion {
@@ -231,6 +253,7 @@ union ceffect {
     struct cef_cap cap;
     struct cef_lag lag;
     struct cef_pulse pulse;
+    struct cef_pulse32 pulse32;
     struct cef_pulseback pulseback;
     struct cef_firering firering;
     struct cef_bubble bubble;
@@ -288,9 +311,11 @@ union ceffect {
 #define SV_UNIQUE 50
 #define SV_MIL_EXP 51
 #define SV_QUESTLOG 52
+#define SV_CEFFECT_COLOR32 54 /* as live: same value as SV_RESERVED1 below */
 #define SV_PROTOCOL 53
 #define SV_RESERVED1 54
-#define SV_RESERVED2 55
+#define SV_DPS 55
+#define SV_RESERVED2 55 /* consumed by version8 DPS; legacy never receives it */
 #define SV_RESERVED3 56
 #define SV_RESERVED4 57
 #define SV_MOD1 58
@@ -352,6 +377,7 @@ union ceffect {
 #define CL_PING 39
 #define CL_GETQUESTLOG 40
 #define CL_REOPENQUEST 41
+#define CL_PLAGUE 42
 
 #define CL_MAX_SURFACE 32
 

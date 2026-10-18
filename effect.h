@@ -37,6 +37,10 @@ Added RCS tags
 #define EF_PULSEBACK 22
 #define EF_FIRERING 23
 #define EF_BUBBLE 24
+#define EF_PULSE32 25 // wire-only: EF_PULSE sent to RGB32 (protocol >= 4) clients
+
+#define BURN_KIND_FIRE 1
+#define BURN_KIND_PLAGUE 2
 
 extern int used_effects;
 
@@ -47,12 +51,19 @@ void free_effect(int fn);
 int remove_effect(int fn);
 
 int create_fireball(int cn, int frx, int fry, int tox, int toy, int str);
+int create_plagueball(int cn, int frx, int fry, int tox, int toy, int str);
 int create_ball(int cn, int frx, int fry, int tox, int toy, int str);
 int create_show_effect(int type, int cn, int start, int stop, int light, int strength);
+int create_fireball_burn(int source_cn, int target, int stop, int depth, int light);
+int create_plague_dot(int source_cn, int target, int stop, int strength, int depth, int light,
+    unsigned short color);
+int plague_duration(int cn);
 int create_flash(int cn, int str, int duration);
 int ishit_fireball(int cn, int frx, int fry, int tox, int toy, int (*isenemy)(int, int));
 int calc_steps_ball(int cn, int frx, int fry, int tox, int toy);
 int create_explosion(int maxage, int base);
+int create_explosion_color(int maxage, int base, unsigned short color);
+int create_explosion_color32(int maxage, int base, unsigned short color, uint32_t color32);
 int add_explosion(int fn, int x, int y);
 void destroy_chareffects(int cn);
 int create_earthrain(int cn, int x, int y, int strength);

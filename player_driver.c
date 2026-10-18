@@ -18,6 +18,7 @@
 #include "drvlib.h"
 #include "error.h"
 #include "tool.h"
+#include "see.h"
 #include "log.h"
 #include "drdata.h"
 #include "player_driver.h"
@@ -167,6 +168,16 @@ static int check_med_prio_task(int cn, int ac, int ac1, int ac2) {
 
 static int check_low_prio_task(int cn, int ac, int ac1, int ac2) {
     switch (ac) {
+    case PAC_PLAGUE:
+        error = ERR_NONE;
+        if (do_plague(cn, ac1, ac2)) return 1;
+        else return error_state();
+    case PAC_PLAGUE2:
+        if (ac1 < 1 || ac1 >= MAXCHARS || !ch[ac1].flags ||
+            ch[ac1].serial != ac2 || !char_see_char(cn, ac1)) return 2;
+        error = ERR_NONE;
+        if (do_plague(cn, ch[ac1].x, ch[ac1].y)) return 1;
+        else return error_state();
     case PAC_FIREBALL:
         if (do_fireball(cn, ac1, ac2)) return 1;
         else return error_state();

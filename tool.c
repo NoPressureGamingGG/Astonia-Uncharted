@@ -2851,10 +2851,6 @@ void sanitize_item(struct item *in, int cn) {
             dlog(cn, 0, "%s: change raw speed to speed skill", in->name);
             in->mod_index[n] = V_SPEEDSKILL;
             break;
-        case V_EMPTY:
-            dlog(cn, 0, "%s: remove +empty", in->name);
-            in->mod_index[n] = in->mod_value[n] = 0;
-            continue;
         case -V_ARMORSKILL:
             armor_req = in->mod_value[n];
             req_idx = n;
