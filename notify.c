@@ -52,7 +52,7 @@ struct msg *alloc_msg(void) {
 
 void free_msg(struct msg *msg) {
     if (!msg->type) {
-        elog("trying to free already free notify msg. message=%p (%d %d %d %d)", msg, msg->type, msg->dat1, msg->dat2, msg->dat3);
+        elog("trying to free already free notify msg. message=%p (%d %d %jd %d)", msg, msg->type, msg->dat1, (intmax_t)msg->dat2, msg->dat3);
         btrace("free_msg");
         return;
     }
@@ -68,12 +68,12 @@ void free_msg(struct msg *msg) {
 
 void add_msg(int cn, struct msg *msg) {
     if (cn < 1 || cn >= MAXCHARS) {
-        elog("illegal add_msg: cn=%d, type=%d, dat=%d,%d,%d", cn, msg->type, msg->dat1, msg->dat2, msg->dat3);
+        elog("illegal add_msg: cn=%d, type=%d, dat=%d,%jd,%d", cn, msg->type, msg->dat1, (intmax_t)msg->dat2, msg->dat3);
         btrace("add_msg");
         return;
     }
     if (!ch[cn].flags) {
-        elog("illegal add_msg: ch[%d].flags=0, type=%d, dat=%d,%d,%d", cn, msg->type, msg->dat1, msg->dat2, msg->dat3);
+        elog("illegal add_msg: ch[%d].flags=0, type=%d, dat=%d,%jd,%d", cn, msg->type, msg->dat1, (intmax_t)msg->dat2, msg->dat3);
         btrace("add_msg");
         return;
     }
@@ -90,7 +90,7 @@ void del_msg(int cn, struct msg *msg) {
     struct msg *prev, *next;
 
     if (!msg->type) {
-        elog("trying to free already free notify msg. char=%s (%d), message=%p (%d %d %d %d)", ch[cn].name, cn, msg, msg->type, msg->dat1, msg->dat2, msg->dat3);
+        elog("trying to free already free notify msg. char=%s (%d), message=%p (%d %d %jd %d)", ch[cn].name, cn, msg, msg->type, msg->dat1, (intmax_t)msg->dat2, msg->dat3);
         btrace("del_msg");
         return;
     }
@@ -105,7 +105,7 @@ void del_msg(int cn, struct msg *msg) {
     else next->prev = prev;
 }
 
-void notify_char(int cn, int type, int dat1, int dat2, int dat3) {
+void notify_char(int cn, int type, int dat1, intptr_t dat2, int dat3) {
     struct msg *msg;
 
     msg = alloc_msg();
@@ -118,7 +118,7 @@ void notify_char(int cn, int type, int dat1, int dat2, int dat3) {
     add_msg(cn, msg);
 }
 
-void notify_area(int xc, int yc, int type, int dat1, int dat2, int dat3) {
+void notify_area(int xc, int yc, int type, int dat1, intptr_t dat2, int dat3) {
     int x, y, xs, xe, ys, ye, cn;
     unsigned long long prof;
 
@@ -142,7 +142,7 @@ void notify_area(int xc, int yc, int type, int dat1, int dat2, int dat3) {
     prof_stop(18, prof);
 }
 
-void notify_area_shout(int xc, int yc, int type, int dat1, int dat2, int dat3) {
+void notify_area_shout(int xc, int yc, int type, int dat1, intptr_t dat2, int dat3) {
     int x, y, xs, xe, ys, ye, cn;
     unsigned long long prof;
 
@@ -184,7 +184,7 @@ void remove_message(int cn, struct msg *msg) {
     free_msg(msg);
 }
 
-void notify_all(int type, int dat1, int dat2, int dat3) {
+void notify_all(int type, int dat1, intptr_t dat2, int dat3) {
     int cn;
 
     for (cn = getfirst_char(); cn; cn = getnext_char(cn)) notify_char(cn, type, dat1, dat2, dat3);

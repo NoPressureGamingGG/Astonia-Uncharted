@@ -13,6 +13,7 @@
 #include <math.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "server.h"
 #include "tool.h"
@@ -58,7 +59,7 @@ void protect(void *mem, unsigned int size) {
     void *ptr;
     unsigned int len, off;
 
-    ptr = (void *)((unsigned int)(((unsigned char *)(mem) + PAGESIZE - 1)) & (~(PAGESIZE - 1)));
+    ptr = (void *)(((uintptr_t)mem + PAGESIZE - 1) & ~(uintptr_t)(PAGESIZE - 1));
     off = (char *)(ptr) - (char *)(mem);
     len = (size - off) & (~(PAGESIZE - 1));
 
@@ -256,7 +257,7 @@ static char *V_tab[V_MAX] = {
     "V_MAGICSHIELD",
     "V_FLASH",
     "V_FIREBALL",
-    "V_ARCANE",
+    "V_PLAGUE",
 
     "V_REGENERATE",
     "V_MEDITATE",
@@ -273,6 +274,10 @@ static int lookup_V(char *name) {
     for (n = 0; n < V_MAX; n++) {
         if (!strcasecmp(V_tab[n], name)) return n;
     }
+
+    /* Slot 34 was historically exposed to templates as V_ARCANE. Keep old
+     * zone content loadable while making V_PLAGUE the canonical token. */
+    if (!strcasecmp(name, "V_ARCANE")) return V_PLAGUE;
 
     return -1;
 }
@@ -1397,27 +1402,27 @@ int init_create(void) {
 
     map = xcalloc(sizeof(struct map) * MAXMAP * MAXMAP, IM_BASE);
     if (!map) return 0;
-    xlog("Allocated map: %.2fM (%d*%d)", sizeof(struct map) * MAXMAP * MAXMAP / 1024.0 / 1024.0, sizeof(struct map), MAXMAP * MAXMAP);
+    xlog("Allocated map: %.2fM (%zu*%d)", sizeof(struct map) * MAXMAP * MAXMAP / 1024.0 / 1024.0, sizeof(struct map), MAXMAP * MAXMAP);
     mem_usage += sizeof(struct map) * MAXMAP * MAXMAP;
 
     it = xcalloc(sizeof(struct item) * MAXITEM, IM_BASE);
     if (!it) return 0;
-    xlog("Allocated items: %.2fM (%d*%d)", sizeof(struct item) * MAXITEM / 1024.0 / 1024.0, sizeof(struct item), MAXITEM);
+    xlog("Allocated items: %.2fM (%zu*%d)", sizeof(struct item) * MAXITEM / 1024.0 / 1024.0, sizeof(struct item), MAXITEM);
     mem_usage += sizeof(struct item) * MAXITEM;
 
     ch = xcalloc(sizeof(struct character) * MAXCHARS, IM_BASE);
     if (!ch) return 0;
-    xlog("Allocated characters: %.2fM (%d*%d)", sizeof(struct item) * MAXCHARS / 1024.0 / 1024.0, sizeof(struct character), MAXCHARS);
+    xlog("Allocated characters: %.2fM (%zu*%d)", sizeof(struct item) * MAXCHARS / 1024.0 / 1024.0, sizeof(struct character), MAXCHARS);
     mem_usage += sizeof(struct item) * MAXCHARS;
 
     it_temp = xcalloc(sizeof(struct it_temp) * MAXTITEM, IM_BASE);
     if (!it_temp) return 0;
-    xlog("Allocated item templates: %.2fM (%d*%d)", sizeof(struct it_temp) * MAXTITEM / 1024.0 / 1024.0, sizeof(struct it_temp), MAXTITEM);
+    xlog("Allocated item templates: %.2fM (%zu*%d)", sizeof(struct it_temp) * MAXTITEM / 1024.0 / 1024.0, sizeof(struct it_temp), MAXTITEM);
     mem_usage += sizeof(struct it_temp) * MAXTITEM;
 
     ch_temp = xcalloc(sizeof(struct ch_temp) * MAXTCHARS, IM_BASE);
     if (!ch_temp) return 0;
-    xlog("Allocated character templates: %.2fM (%d*%d)", sizeof(struct ch_temp) * MAXTCHARS / 1024.0 / 1024.0, sizeof(struct ch_temp), MAXTCHARS);
+    xlog("Allocated character templates: %.2fM (%zu*%d)", sizeof(struct ch_temp) * MAXTCHARS / 1024.0 / 1024.0, sizeof(struct ch_temp), MAXTCHARS);
     mem_usage += sizeof(struct ch_temp) * MAXTCHARS;
 
     // add characters to free list

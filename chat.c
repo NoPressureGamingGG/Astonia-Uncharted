@@ -101,7 +101,7 @@ static int connect_chat(void) {
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(5554);
-    addr.sin_addr.s_addr = *(unsigned long *)(*he->h_addr_list); //htonl((195<<24)+(50<<16)+(130<<8)+3);
+    addr.sin_addr.s_addr = *(uint32_t *)(*he->h_addr_list); //htonl((195<<24)+(50<<16)+(130<<8)+3);
 
     ioctl(sock, FIONBIO, (u_long *)&one); // non-blocking mode
 

@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 /*
  *
  * $Id: server.h,v 1.4 2006/12/14 13:58:05 devel Exp $
@@ -320,7 +322,7 @@ extern struct item *it;
 #define V_FLASH 32
 #define V_FIREBALL 33
 #define V_FIRE V_FIREBALL
-#define V_EMPTY 34
+#define V_PLAGUE 34
 #define V_REGENERATE 35
 #define V_MEDITATE 36
 #define V_IMMUNITY 37
@@ -514,7 +516,9 @@ struct effect {
 
     int start, stop; // ticker effect started, ends
 
-    int cn, sercn; // creator of effect (caster)
+    int cn, sercn; // creator of effect (caster) or effect target for show effects
+    int source_cn; // original caster for source-aware cosmetic effects
+    int burn_hits; // cosmetic burn applications received (for presentation)
     int strength; // strength of effect (usually skill level of caster)
     int light; // light emitted by effect
 
@@ -529,9 +533,40 @@ struct effect {
     int number_of_enemies; // number of enemies hit by effect last tick
 
     int base_sprite; // for explosion: sprite number
+    int variant; // missile presentation variant; zero is vanilla Fireball
+    int burn_kind; // 0 none, 1 cosmetic Fireball burn, 2 damaging Plague pDOT
+    unsigned short spell_color; // packed effect color sent to the client, zero means client default
+    uint32_t spell_color32; // RGB888 for negotiated RGB32 effect packets, zero means client default
 };
 
 extern struct effect *ef;
+
+// *********** SERVER/DRIVER ABI FINGERPRINT ******************
+// Every module that includes this header (server and each runtime/*.dll)
+// carries an identical copy. libload refuses to start with a driver whose
+// copy is missing or differs, so a stale driver can never index ch/it/ef/map
+// with an old layout. Bump AU_ABI_VERSION for shared-contract changes that
+// sizeof()/offsetof() below would not catch. Check: tools/abi_check.py.
+#include <stddef.h>
+#define AU_ABI_MAGIC 0x41554142u /* "AUAB" */
+// Version ranges: 1-99 = this repository history (1 = 64-bit, 2 = burn system,
+// 3 = Plagueball); 100+ = the owner's live development tree, whose layout differs.
+// The ranges must never overlap; a merge of the two needs a fresh number in 1-99.
+#define AU_ABI_VERSION 3u
+struct au_abi {
+    uint32_t magic, version, ptr_size, maxfield;
+    uint32_t sz_map, sz_item, sz_character, sz_effect;
+    uint32_t off_effect_field_cnt, off_effect_m;
+    uint32_t off_effect_source_cn, off_effect_burn_hits, off_effect_burn_kind;
+    uint32_t off_effect_variant, off_effect_spell_color, off_effect_spell_color32;
+};
+__attribute__((weak, visibility("default"), used)) const struct au_abi au_abi_info = {
+    AU_ABI_MAGIC, AU_ABI_VERSION, (uint32_t)sizeof(void *), MAXFIELD,
+    (uint32_t)sizeof(struct map), (uint32_t)sizeof(struct item), (uint32_t)sizeof(struct character), (uint32_t)sizeof(struct effect),
+    (uint32_t)offsetof(struct effect, field_cnt), (uint32_t)offsetof(struct effect, m),
+    (uint32_t)offsetof(struct effect, source_cn), (uint32_t)offsetof(struct effect, burn_hits),
+    (uint32_t)offsetof(struct effect, burn_kind), (uint32_t)offsetof(struct effect, variant),
+    (uint32_t)offsetof(struct effect, spell_color), (uint32_t)offsetof(struct effect, spell_color32)};
 
 // *********** BASIC LIBRARY ******************
 unsigned long long prof_start(int task);

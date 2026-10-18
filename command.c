@@ -47,6 +47,7 @@
 #include "club.h"
 #include "questlog.h"
 #include "player_driver.h"
+#include "dps.h"
 
 struct gotolist {
     char *name;
@@ -508,6 +509,16 @@ static int cmd_tell(int cn, char *ptr) {
     return 1;
 }
 
+static void cmd_resetdps(int cn, char *ptr) {
+    while (isspace((unsigned char)*ptr)) ptr++;
+    if (*ptr) {
+        log_char(cn, LOG_SYSTEM, 0, "Usage: /resetdps");
+        return;
+    }
+    dps_reset(cn);
+    log_char(cn, LOG_SYSTEM, 0, "Your DPS tracker has been reset.");
+}
+
 static void cmd_who(int cn) {
     int co;
 
@@ -859,6 +870,7 @@ static void cmd_help(int cn) {
     log_char(cn, LOG_SYSTEM, 0, "/clearhate - empty hate list completely");
     log_char(cn, LOG_SYSTEM, 0, "/tell <name> <text> - send a private message to another player");
     log_char(cn, LOG_SYSTEM, 0, "/allow <name> - allow another player to search your grave");
+    log_char(cn, LOG_SYSTEM, 0, "/resetdps - clear your DPS, peak and last hit");
     log_char(cn, LOG_SYSTEM, 0, "/status - show your lag control status and account options");
     log_char(cn, LOG_SYSTEM, 0, "/lag - create artificial lag");
     log_char(cn, LOG_SYSTEM, 0, "/maxlag <seconds> - set delay for lag control");
@@ -1238,10 +1250,10 @@ int command(int cn, char *ptr) { // 1=ok, 0=repeat
     expand_alias(cn, buf, ptr);
     ptr = buf;
 
-    if (areaID == 20 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
-    if (areaID == 35 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
-    if (areaID == 23 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
-    if (areaID == 24 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (int)(ptr), 0) == 2) return 1;
+    if (areaID == 20 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
+    if (areaID == 35 && char_driver(CDR_LQPARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
+    if (areaID == 23 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
+    if (areaID == 24 && char_driver(CDR_STRATEGY_PARSER, CDT_SPECIAL, cn, (intptr_t)ptr, 0) == 2) return 1;
 
     if (*ptr != '#' && *ptr != '/') {
         if (ch[cn].flags & CF_SHUTUP) {
@@ -1930,6 +1942,22 @@ int command(int cn, char *ptr) { // 1=ok, 0=repeat
         return 1;
     }
 
+    if ((len = cmdcmp(ptr, "plague", 6))) {
+        int x, y;
+
+        ptr += len;
+        while (isspace(*ptr)) ptr++;
+        x = atoi(ptr);
+        while (isdigit(*ptr)) ptr++;
+        while (isspace(*ptr)) ptr++;
+        y = atoi(ptr);
+        if (!(ch[cn].flags & CF_PLAYER) || !ch[cn].player ||
+            x < 1 || x >= MAXMAP - 1 || y < 1 || y >= MAXMAP - 1) {
+            log_char(cn, LOG_SYSTEM, 0, "Plague could not be cast at %d,%d.", x, y);
+        } else player_driver_mapspell(ch[cn].player, PAC_PLAGUE, x, y);
+        return 1;
+    }
+
     if ((len = cmdcmp(ptr, "jump", 4)) && (ch[cn].flags & (CF_STAFF | CF_GOD))) {
         int x = 0, y = 0, a = 0, m = 0, n;
 
@@ -2183,6 +2211,11 @@ int command(int cn, char *ptr) { // 1=ok, 0=repeat
         cmd_questfix(cn, ptr);
         return 1;
     }
+    if ((len = cmdcmp(ptr, "resetdps", 8))) {
+        cmd_resetdps(cn, ptr + len);
+        return 1;
+    }
+
     if ((len = cmdcmp(ptr, "reset", 5)) && (ch[cn].flags & (CF_GOD))) {
         ptr += len;
         while (isspace(*ptr)) ptr++;

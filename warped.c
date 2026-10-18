@@ -51,7 +51,7 @@ int ch_died_driver(int nr, int cn, int co); // called when a character dies
 int ch_respawn_driver(int nr, int cn); // called when an NPC is about to respawn
 
 // EXPORTED - character/item driver
-int driver(int type, int nr, int obj, int ret, int lastact) {
+int driver(int type, int nr, int obj, intptr_t ret, int lastact) {
     switch (type) {
     case CDT_DRIVER:
         return ch_driver(nr, obj, ret, lastact);
@@ -797,8 +797,8 @@ void warpfighter(int cn, int ret, int lastact) {
                     it[in].driver = IDR_FREEZE;
                     it[in].carried = cn;
                     ch[cn].item[fre] = in;
-                    *(signed long *)(it[in].drdata) = ticker + TICKS * 60;
-                    *(signed long *)(it[in].drdata + 4) = ticker;
+                    *(int32_t *)(it[in].drdata) = ticker + TICKS * 60;
+                    *(int32_t *)(it[in].drdata + 4) = ticker;
                     create_spell_timer(cn, in, fre);
                     update_char(cn);
                 }

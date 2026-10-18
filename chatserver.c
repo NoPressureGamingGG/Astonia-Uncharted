@@ -46,7 +46,8 @@ void kick_chat(int nr) {
 }
 
 void new_chat(int sock) {
-    int n, nsock, len = sizeof(struct sockaddr_in), one = 1;
+    int n, nsock, one = 1;
+    socklen_t len = sizeof(struct sockaddr_in);
     struct sockaddr_in addr;
 
     nsock = accept(sock, (struct sockaddr *)&addr, &len);
@@ -96,11 +97,11 @@ void send_chat(int nr) {
     if (chat[nr].optr == OUTBUFSIZE) chat[nr].optr = 0;
 }
 
-int internal_chat(unsigned char *buf, int len) {
+int internal_chat(char *buf, int len) {
     return 0; // ... !!!!!!!!!
 }
 
-int csend(int nr, unsigned char *buf, int len) {
+int csend(int nr, char *buf, int len) {
     int tmp;
 
     if (chat[nr].sock == 0) return -1;

@@ -1322,6 +1322,7 @@ enum tasktype {
     attackback,
     flee,
     firering,
+    plague,
     maxtasktype
 };
 
@@ -1478,6 +1479,16 @@ static int fight_driver_attack_enemy(int cn, int co, int nomove, int nobless, in
         may_add_spell(cn, IDR_FIRERING)) {
         task[maxtask].task = firering;
         maxvalue += (task[maxtask].value = fight_driver_fireball_value(cn, co));
+        maxtask++;
+    }
+
+    // NPC Plague (owner 2026-10-10): cast like a fireball when the path is clear
+    if (ch[cn].value[0][V_PLAGUE] > 1 &&
+        ch[cn].mana >= FIREBALLCOST &&
+        !(ch[cn].flags & CF_PLAYER) &&
+        ishit_fireball(cn, ch[cn].x, ch[cn].y, ch[co].x, ch[co].y, fight_driver_fireball_enemy_check)) {
+        task[maxtask].task = plague;
+        maxvalue += (task[maxtask].value = MED_PRIO + ch[cn].value[0][V_PLAGUE]);
         maxtask++;
     }
 
@@ -1640,6 +1651,9 @@ static int fight_driver_attack_enemy(int cn, int co, int nomove, int nobless, in
                 break;
             case firering:
                 ret = do_fireball(cn, ch[cn].x, ch[cn].y);
+                break;
+            case plague:
+                ret = do_plague(cn, ch[co].x, ch[co].y);
                 break;
 
             default:
@@ -2139,7 +2153,7 @@ int add_bonus_spell(int cn, int driver, int strength, int duration) {
 
     endtime = ticker + duration;
 
-    *(unsigned long *)(it[in].drdata) = endtime;
+    *(uint32_t *)(it[in].drdata) = endtime;
 
     it[in].carried = cn;
 

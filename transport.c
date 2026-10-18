@@ -41,7 +41,7 @@ int it_driver(int nr, int in, int cn); // item driver (special cases for use)
 int ch_died_driver(int nr, int cn, int co); // called when a character dies
 
 // EXPORTED - character/item driver
-int driver(int type, int nr, int obj, int ret, int lastact) {
+int driver(int type, int nr, int obj, intptr_t ret, int lastact) {
     switch (type) {
     case 0:
         return ch_driver(nr, obj, ret, lastact);

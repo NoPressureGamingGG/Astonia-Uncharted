@@ -42,20 +42,20 @@ int init_sector(void) {
 
     for (n = 0; n < 8; n++) {
         sector[n] = xcalloc(MAXMAP * MAXMAP / ((1 << n) * (1 << n)) * sizeof(int), IM_BASE);
-        xlog("Allocated sector %d: %.2fM (%d*%d)", n, MAXMAP * MAXMAP / ((1 << n) * (1 << n)) * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP / ((1 << n) * (1 << n)));
+        xlog("Allocated sector %d: %.2fM (%zu*%d)", n, MAXMAP * MAXMAP / ((1 << n) * (1 << n)) * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP / ((1 << n) * (1 << n)));
         mem_usage += MAXMAP * MAXMAP / ((1 << n) * (1 << n)) * sizeof(int);
     }
 
     char_sector = xcalloc(MAXMAP * MAXMAP / 64 * sizeof(int), IM_BASE);
-    xlog("Allocated char sector: %.2fM (%d*%d)", MAXMAP * MAXMAP / 64 * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP / 64);
+    xlog("Allocated char sector: %.2fM (%zu*%d)", MAXMAP * MAXMAP / 64 * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP / 64);
     mem_usage += MAXMAP * MAXMAP / 64 * sizeof(int);
 
     sound_sector = xcalloc(MAXMAP * MAXMAP * sizeof(int), IM_BASE);
-    xlog("Allocated sound sector: %.2fM (%d*%d)", MAXMAP * MAXMAP * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP);
+    xlog("Allocated sound sector: %.2fM (%zu*%d)", MAXMAP * MAXMAP * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP);
     mem_usage += MAXMAP * MAXMAP * sizeof(int);
 
     shout_sector = xcalloc(MAXMAP * MAXMAP * sizeof(int), IM_BASE);
-    xlog("Allocated shout sector: %.2fM (%d*%d)", MAXMAP * MAXMAP * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP);
+    xlog("Allocated shout sector: %.2fM (%zu*%d)", MAXMAP * MAXMAP * sizeof(int) / 1024.0 / 1024.0, sizeof(int), MAXMAP * MAXMAP);
     mem_usage += MAXMAP * MAXMAP * sizeof(int);
 
     return 1;
@@ -295,7 +295,7 @@ void init_sound_sector(void) {
 
     sec2_cnt = nr;
     sec2 = xcalloc(sizeof(struct sector2) * sec2_cnt, IM_BASE);
-    xlog("Allocated sector2: %.2fM (%d*%d)", sec2_cnt * sizeof(struct sector2) / 1024.0 / 1024.0, sizeof(struct sector2), sec2_cnt);
+    xlog("Allocated sector2: %.2fM (%zu*%d)", sec2_cnt * sizeof(struct sector2) / 1024.0 / 1024.0, sizeof(struct sector2), sec2_cnt);
     mem_usage += sec2_cnt * sizeof(struct sector2);
 
     for (n = 0; n < MAXDOOR; n++) {
