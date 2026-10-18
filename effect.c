@@ -1204,6 +1204,11 @@ static void ef_burn(int fn) {
     // Plague pDOT uses the Lightning Strike damage formula, but remains a
     // separate burn branch and credits its current owner (a stronger ball takes over).
     // It ticks for its whole lifetime (start..stop), so a visible infection always damages.
+    // a caster who left and whose slot was reused is not the caster any more: the
+    // infection then neither damages nor spreads in that stranger's name
+    if (ef[fn].burn_kind == BURN_KIND_PLAGUE && ef[fn].source_cn && !dps_effect_source_alive(fn))
+        ef[fn].source_cn = 0;
+
     if (ef[fn].burn_kind == BURN_KIND_PLAGUE && (ticker & 3) == 0) {
         int attacker = ef[fn].source_cn;
         int dam = 0;

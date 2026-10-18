@@ -11,5 +11,6 @@ int dps_build_packet(int cn, int version, unsigned char *buf);
 void dps_bind_effect(int fn, int source);
 void dps_forget_effect(int fn);
 void dps_copy_effect_owner(int to, int from);
+int dps_effect_source_alive(int fn);
 int dps_hurt_effect(int fn, int target, int damage, int source, int armordiv, int armorper, int shieldper);
 #endif

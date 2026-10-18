@@ -89,6 +89,17 @@ void dps_bind_effect(int fn, int source) {
     owners[fn].effect_serial = ef[fn].serial; owners[fn].source = source;
     owners[fn].source_serial = source > 0 && source < MAXCHARS && ch[source].flags ? ch[source].serial : 0;
 }
+// 1 while the character bound to effect fn is still the same one (its slot was not
+// freed and reused); 1 too when no binding was recorded, so callers keep old behaviour.
+int dps_effect_source_alive(int fn) {
+    int source;
+
+    if (!owners || fn < 1 || fn >= MAXEFFECT || fn >= owner_capacity) return 1;
+    if (owners[fn].effect_serial != ef[fn].serial) return 1;
+    source = owners[fn].source;
+    if (source < 1 || source >= MAXCHARS) return 1;
+    return ch[source].flags && ch[source].serial == owners[fn].source_serial;
+}
 void dps_copy_effect_owner(int to, int from) {
     if (!owners || to < 1 || from < 1 || to >= MAXEFFECT || from >= MAXEFFECT || to >= owner_capacity || from >= owner_capacity) return;
     if (owners[from].effect_serial != ef[from].serial) { owners[to].source_serial = 0; return; }
