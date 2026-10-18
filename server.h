@@ -549,6 +549,9 @@ extern struct effect *ef;
 // sizeof()/offsetof() below would not catch. Check: tools/abi_check.py.
 #include <stddef.h>
 #define AU_ABI_MAGIC 0x41554142u /* "AUAB" */
+// Version ranges: 1-99 = this repository history (1 = 64-bit, 2 = burn system,
+// 3 = Plagueball); 100+ = the owner's live development tree, whose layout differs.
+// The ranges must never overlap; a merge of the two needs a fresh number in 1-99.
 #define AU_ABI_VERSION 3u
 struct au_abi {
     uint32_t magic, version, ptr_size, maxfield;
